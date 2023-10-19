@@ -141,6 +141,7 @@ const Index = () => {
                 await axios.get(`api/v1/artifacts/quarter/${quarterId}`).then(
                     ({ data }) => {
                         setArtiffacts(data.results)
+                        console.log(artiffacts)
                     }
                 )
             }

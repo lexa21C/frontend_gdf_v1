@@ -80,13 +80,14 @@ export default function List() {
 
   }, [modal, showAlertCuestion]);
   const filterUser = users?.filter(
-  (user) =>
-    user.complete_names.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.type_profile.some((type_profile) =>
-      type_profile.type_profile.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-);
+    (user) =>
+      user.complete_names.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.type_profile?.some((type_profile) =>
+        type_profile.type_profile.toLowerCase().includes(searchTerm.toLowerCase())
+      ))
+  );
+  
 
   return (
     <>

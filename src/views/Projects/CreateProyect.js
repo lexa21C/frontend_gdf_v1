@@ -206,7 +206,7 @@ const Modal = ({ isOpen, toggle, apiGet, type, apiGetC, record }) => {
     }
 
     if (type === false) {
-      console.log(data)
+  
       axios.post("api/v1/project", data).then((res) => {
         if (res.data.status === 'success') {
 

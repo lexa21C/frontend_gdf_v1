@@ -36,6 +36,7 @@ const Invitado = (props) => {
   const navigate = useNavigate();
   React.useEffect(() => {
     document.documentElement.scrollTop = 0;
+    
     document.scrollingElement.scrollTop = 0;
     mainContent.current.scrollTop = 0;
     setTypeProfile('Invitado');

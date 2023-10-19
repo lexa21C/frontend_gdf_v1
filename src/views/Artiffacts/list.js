@@ -45,6 +45,7 @@ function LisModal(props) {
     }, [props.learningResult]);
 
     const handleArtifactChange = (index, event) => {
+        console.log('')
         const newArtifacts = [...artifacts];
         newArtifacts[index] = {
             ...newArtifacts[index],

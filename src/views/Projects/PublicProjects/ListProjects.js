@@ -139,7 +139,7 @@ const fecthProjectData = async () => {
 
   return (
     <>
-      <Head title='Ficha: ' description={`${number_record}`} />
+      <Head title='Proyectos'  />
       <Reactstrap.Container className="mt--7" fluid>
         <Reactstrap.Row>
           <div className="col">

@@ -46,13 +46,14 @@ function CreateModal(props) {
             e.preventDefault();
             const url = 'api/v1/artiffacts';
             const { data: res } = await axios.post(url, data).then((res) => {
-                console.log(res);
+                console.log('create')
                 initModal();
                 mensajes();
                 setData({ ...data, name: '',description:''});
             });
             console.log(res.message);
         } catch (error) {
+            console.log(error)
             if (error.response &&
                 error.response.status >= 400 &&
                 error.response.status <= 500
@@ -74,7 +75,7 @@ function CreateModal(props) {
 
             <Modal show={isShow}>
                 <Modal.Header  onClick={initModal}>
-                    <Modal.Title>Registrar Artefacto </Modal.Title>
+                    <Modal.Title>Registrar Artefacto  </Modal.Title>
                 </Modal.Header>
 
                 <form onSubmit={handleSubmit}>

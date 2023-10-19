@@ -48,8 +48,6 @@ const Login = () => {
       // localStorage.setItem("formation_program", user[0].formation_program[0]);
       // localStorage.setItem("_id", user[0]._id);
       localStorage.setItem("User", JSON.stringify(user));
-      console.log('json.stringify')
-      console.log(JSON.stringify(user))
       localStorage.setItem("isLogin", true);
       setIsLoggendIn(localStorage.getItem("isLogin"))
       const updatedUserJson = user;
@@ -71,24 +69,7 @@ const Login = () => {
     }
   };
   const invitado = async () => {
-      // localStorage.setItem("formation_program", user[0].formation_program[0]);
-      // localStorage.setItem("_id", user[0]._id);
-      // console.log('invitado')
-      // const user = {
-      //   "complete_names": "invitado",
-      //   "type_profile": [
-      //     {
-      //       "type_profile": "Invitado",
-      //     }
-      //   ],
-        
-          
-      // };
-      // const updatedUserJson = user;
-      // console.log('updated ')
-      // console.log(updatedUserJson)
-      // setUserJson(updatedUserJson);
-      // setUserJson(user)
+      
       navigate("/invitado/projects");
     
     
