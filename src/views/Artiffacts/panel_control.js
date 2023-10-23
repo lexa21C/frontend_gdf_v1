@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "components/Headers/HEAD.js";
 import * as Reactstrap from "reactstrap";
@@ -9,6 +8,7 @@ import ModalQuarter from "./modalQuarter";
 import { NavLink as NavLinkRRD } from "react-router-dom";
 import routes from "../../routes.js";
 import { NavLink } from 'react-router-dom';
+import AlertModal from '../../components/Alert/ALertModalCuestion.js'; 
 
 
 
@@ -86,9 +86,11 @@ const Index = () => {
     const [quarter, setQuarter] = useState([])
     const [typeQuarter, setTypeQuarter] = useState(false)
     const [modalQuarter, setModalQuarter] = useState(false)
+    const [showAlert, setShowAlert] = useState(false);
 
     const [records, setRecords] = useState([])
-
+    const [modalDelete, setModalDelete] = useState(false); // Define modalDelete y su función setModalDelete
+    const [deleteItemId, setDeleteItemId] = useState(null); // Define deleteItemId y su función setDeleteItemId
     const competence = data?.map((e) => {
         return e.competences
     })
@@ -114,17 +116,22 @@ const Index = () => {
         setModal(!modal);
         setType(true);
     }
+    
     const deletes = async (id) => {
-        await axios.delete(`api/v1/quarter/${id}`).then(
-            setDeleter(!ddelete)
-        )
+        // Configura showAlert a true para mostrar la alerta
+        setShowAlert(true);
+        // Establece el ID del elemento que se va a eliminar
+        setDeleteItemId(id);
     }
+    
 
     const deletesArtiffact = async (id) => {
-        await axios.delete(`api/v1/artiffacts/${id}`).then(
-            setDeleter(!ddelete)
-        )
+        await axios.delete(`/api/v1/artifacts/${id}`).then(() => {
+            setDeleter(!ddelete);
+        });
     }
+
+
     useEffect(() => {
         setQuarterId(quarter?._id)
         async function fetchData() {
@@ -169,6 +176,22 @@ const Index = () => {
                 quarter={quarter}
                 artiffactOne={artiffactOne}
             />
+          {showAlert && (
+    <AlertModal
+    api={`api/v1/quarter/${deleteItemId}`} // Pasa la API correspondiente
+    onClose={(confirmed) => {
+        if (confirmed) {
+            // Realiza la eliminación si el usuario confirmó
+            deletes(deleteItemId);
+        }
+        setDeleteItemId(null); // Restablece el ID a null después de la confirmación o el cierre del modal
+        // Configura showAlert a false para ocultar la alerta
+        setShowAlert(false);
+    }}
+/>
+
+)}
+
             {/* Page content */}
             <Reactstrap.Container className="mt--7" fluid>
                 <Reactstrap.Row>
@@ -228,14 +251,15 @@ const Index = () => {
                                                                     Editar
                                                                 </Reactstrap.UncontrolledTooltip>
                                                                 <Reactstrap.Button
-                                                                    color="primary"
-                                                                    type="button"
-                                                                    className="btn-neutral  btn-sm m-3"
-                                                                    onClick={() => deletesArtiffact(item._id)}
-                                                                    id={`icon2${item._id}`}
-                                                                >
-                                                                    <i className="fa-solid fa-trash"></i>
-                                                                </Reactstrap.Button>
+    color="primary"
+    type="button"
+    className="btn-neutral  btn-sm m-3"
+    onClick={() => setShowAlert(true)} // Configura showAlert a true al hacer clic en el botón
+    id={`icon2${item._id}`}
+>
+    <i className="fa-solid fa-trash"></i>
+</Reactstrap.Button>
+
                                                                 <Reactstrap.UncontrolledTooltip
                                                                     delay={0}
                                                                     target={`icon2${item._id}`}
