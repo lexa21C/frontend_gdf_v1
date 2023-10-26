@@ -89,8 +89,8 @@ const Index = () => {
     const [showAlert, setShowAlert] = useState(false);
 
     const [records, setRecords] = useState([])
-    const [modalDelete, setModalDelete] = useState(false); // Define modalDelete y su función setModalDelete
-    const [deleteItemId, setDeleteItemId] = useState(null); // Define deleteItemId y su función setDeleteItemId
+    const [modalDelete, setModalDelete] = useState(false); 
+    const [deleteItemId, setDeleteItemId] = useState(null); 
     const [deleteApi, setDeleteApi] = useState(null)
     const competence = data?.map((e) => {
         return e.competences
@@ -112,6 +112,7 @@ const Index = () => {
         setModalQuarter(!modalQuarter);
         setTypeQuarter(true);
     };
+
     const Edit2 = (item) => {
         setArtiffactOne(item)
         setModal(!modal);
@@ -121,19 +122,16 @@ const Index = () => {
     const deletes = async (id) => {
         // Configura showAlert a true para mostrar la alerta
         setShowAlert(true);
-        // Establece el ID del elemento que se va a eliminar
         setDeleteItemId(id);
         setDeleteApi('quarter')
     }
 
       
     const deletes1 = async (id) => {
-        // Configura showAlert a true para mostrar la alerta
         setShowAlert(true);
         console.log(id)
-        // Establece el ID del elemento que se va a eliminar
         setDeleteItemId(id);
-        setDeleteApi(`/api/v1/artifacts/${id}`)
+        setDeleteApi('artiffacts')
     }
     
     
