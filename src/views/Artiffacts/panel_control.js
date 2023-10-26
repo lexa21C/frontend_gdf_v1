@@ -165,7 +165,7 @@ const Index = () => {
             }
         }
         fetchData();
-    }, [modalQuarter, ddelete, quarter, quarterId, modal, showAlert]);
+    }, [modalQuarter, quarter, quarterId, modal, showAlert,ddelete]);
 
 
     return (
