@@ -5,6 +5,7 @@ import { show_alert } from 'components/Alerts/Alert.js';
 import { useParams } from 'react-router-dom';
 import Select from "react-select";
 
+
 export default function Modal({ isOpen, toggle, type, competences, quarter }) {
     let { formation_program } = useParams()
     const [selectedOptions, setSelectedOptions] = useState([]);
@@ -48,13 +49,25 @@ export default function Modal({ isOpen, toggle, type, competences, quarter }) {
         e.preventDefault();
         try {
             if (type === false) {
-                show_alert('Creado Correctamente', 'success')
-                const { data: res } = axios.post('api/v1/quarter', data);
-              
-            } else {
+                axios.post('api/v1/quarter', data).then((response) => {
+                    console.log('modal')
+                    console.log(response)
+                const { data: res } = response
+                if (response.data.code === 'success'){
+                    console.log('error')
+                    show_alert('Creado Correctamente', 'success')
+                }
+                else {
+                    console.log('error')
+                    show_alert(response.data.message, 'Failed')
+                }
+                });
+
+
+
+            }else {
                 show_alert('Editado correctamente', 'success')
                 const { data: res } = axios.put(`api/v1/quarter/${data._id}`, data);
-                console.log(res);
             }
 
             toggle(!toggle);
