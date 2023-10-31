@@ -54,7 +54,7 @@ export default function Modal({ isOpen, toggle, type,competences ,quarterId,OneA
                 competence: '',
                 quarter:quarterId,
                 name: '',
-                descrition: '',
+                description: '',
             })
         } catch (error) {
             if (

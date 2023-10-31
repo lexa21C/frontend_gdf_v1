@@ -8,7 +8,7 @@ import ModalQuarter from "./modalQuarter";
 import { NavLink as NavLinkRRD } from "react-router-dom";
 import routes from "../../routes.js";
 import { NavLink } from 'react-router-dom';
-import AlertModal from '../../components/Alert/ALertModalCuestion.js'; 
+import AlertModal from '../../components/Alert/ALertModalCuestion.js';
 
 
 
@@ -75,6 +75,8 @@ const Index = () => {
     let { formation_program } = useParams()
     let { program } = useParams()
 
+    const [mostrarBoton, setMostrarBoton] = useState(false);
+
     const [artiffactOne, setArtiffactOne] = useState([])
     const [data, setData] = useState([])
     const [quarterId, setQuarterId] = useState(null)
@@ -89,8 +91,8 @@ const Index = () => {
     const [showAlert, setShowAlert] = useState(false);
 
     const [records, setRecords] = useState([])
-    const [modalDelete, setModalDelete] = useState(false); 
-    const [deleteItemId, setDeleteItemId] = useState(null); 
+    const [modalDelete, setModalDelete] = useState(false);
+    const [deleteItemId, setDeleteItemId] = useState(null);
     const [deleteApi, setDeleteApi] = useState(null)
     const competence = data?.map((e) => {
         return e.competences
@@ -107,6 +109,10 @@ const Index = () => {
 
     };
 
+    const toggle3 = () => {
+        setMostrarBoton(!mostrarBoton);
+    };
+
     const Edit = (r) => {
         setQuarter(r);
         setModalQuarter(!modalQuarter);
@@ -118,7 +124,7 @@ const Index = () => {
         setModal(!modal);
         setType(true);
     }
-    
+
     const deletes = async (id) => {
         // Configura showAlert a true para mostrar la alerta
         setShowAlert(true);
@@ -126,15 +132,15 @@ const Index = () => {
         setDeleteApi('quarter')
     }
 
-      
+
     const deletes1 = async (id) => {
         setShowAlert(true);
         console.log(id)
         setDeleteItemId(id);
         setDeleteApi('artiffacts')
     }
-    
-    
+
+
 
     // const deletesArtiffact = async (id) => {
     //     await axios.delete(`/api/v1/artifacts/${id}`).then(() => {
@@ -165,7 +171,7 @@ const Index = () => {
             }
         }
         fetchData();
-    }, [modalQuarter, quarter, quarterId, modal, showAlert,ddelete]);
+    }, [modalQuarter, quarter, quarterId, modal, showAlert, ddelete]);
 
 
     return (
@@ -187,21 +193,21 @@ const Index = () => {
                 quarter={quarter}
                 artiffactOne={artiffactOne}
             />
-          {showAlert && (
-    <AlertModal
-    api={`api/v1/${deleteApi}/${deleteItemId}`} // Pasa la API correspondiente
-    onClose={(confirmed) => {
-        if (confirmed) {
-            // Realiza la eliminación si el usuario confirmó
-            deletes(deleteItemId);
-        }
-        setDeleteItemId(null); // Restablece el ID a null después de la confirmación o el cierre del modal
-        // Configura showAlert a false para ocultar la alerta
-        setShowAlert(false);
-    }}
-/>
+            {showAlert && (
+                <AlertModal
+                    api={`api/v1/${deleteApi}/${deleteItemId}`} // Pasa la API correspondiente
+                    onClose={(confirmed) => {
+                        if (confirmed) {
+                            // Realiza la eliminación si el usuario confirmó
+                            deletes(deleteItemId);
+                        }
+                        setDeleteItemId(null); // Restablece el ID a null después de la confirmación o el cierre del modal
+                        // Configura showAlert a false para ocultar la alerta
+                        setShowAlert(false);
+                    }}
+                />
 
-)}
+            )}
 
             {/* Page content */}
             <Reactstrap.Container className="mt--7" fluid>
@@ -221,12 +227,16 @@ const Index = () => {
                                             <Reactstrap.CardHeader className="bg-transparent">
                                                 <Reactstrap.Row className="align-items-center">
                                                     <div className="col">
-                                                        <Reactstrap.Button color="primary"
-                                                            type="button"
-                                                            className="btn-circle btn-neutral "
-                                                            onClick={toggle}>
-                                                            <i className="ni ni-fat-add" />
-                                                        </Reactstrap.Button>
+                                                        {mostrarBoton && (
+                                                            <Reactstrap.Button
+                                                                color="primary"
+                                                                type="button"
+                                                                className="btn-circle btn-neutral"
+                                                                onClick={toggle}
+                                                            >
+                                                                <i className="ni ni-fat-add" />
+                                                            </Reactstrap.Button>
+                                                        )}
                                                     </div>
                                                 </Reactstrap.Row>
                                             </Reactstrap.CardHeader>
@@ -262,20 +272,20 @@ const Index = () => {
                                                                     Editar
                                                                 </Reactstrap.UncontrolledTooltip>
                                                                 <Reactstrap.Button
-                                                            color="primary"
-                                                            type="button"
-                                                            className="btn-neutral  btn-sm m-3"
-                                                            onClick={() => deletes1(item._id)}
-                                                            id={`icon1${item.borrar}`}
-                                                        >
-                                                            <i className="fa-solid fa-trash"></i>
-                                                        </Reactstrap.Button>
-                                                        <Reactstrap.UncontrolledTooltip
-                                                            delay={0}
-                                                            target={`icon1${item.borrar}`}
-                                                        >
-                                                            Eliminar
-                                                        </Reactstrap.UncontrolledTooltip></td>
+                                                                    color="primary"
+                                                                    type="button"
+                                                                    className="btn-neutral  btn-sm m-3"
+                                                                    onClick={() => deletes1(item._id)}
+                                                                    id={`icon1${item.borrar}`}
+                                                                >
+                                                                    <i className="fa-solid fa-trash"></i>
+                                                                </Reactstrap.Button>
+                                                                <Reactstrap.UncontrolledTooltip
+                                                                    delay={0}
+                                                                    target={`icon1${item.borrar}`}
+                                                                >
+                                                                    Eliminar
+                                                                </Reactstrap.UncontrolledTooltip></td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
@@ -304,57 +314,68 @@ const Index = () => {
                                     </div>
                                 </Reactstrap.Row>
                             </Reactstrap.CardHeader>
-                                <Reactstrap.Table className="align-items-center table-flush bg-white shadow" responsive>
-                                    <thead className="thead-light">
-                                        <tr>
+                            <Reactstrap.Table className="align-items-center table-flush bg-white shadow" responsive>
+                                <thead className="thead-light">
+                                    <tr>
                                         <th scope="col">N°</th>
                                         <th scope="col">Trimestre</th>
                                         <th scope="col">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {data?.map((e) => (
-                                            e?.quarters.map((r, index) => ( 
-                                                <tr key={r._id}>
-                                                     <th>{index + 1}</th>
-                                                    <td onClick={() => setQuarter(r)}>{r.number}</td>
-                                                    <td>
-                                                        <Reactstrap.Button
-                                                            color="primary"
-                                                            type="button"
-                                                            className="btn-neutral  btn-sm m-0"
-                                                            onClick={() => Edit(r)}
-                                                            id={`icon1${r._id}`}
-                                                        >
-                                                            <i className="fa-solid fa-pencil"></i>
-                                                        </Reactstrap.Button>
-                                                        <Reactstrap.UncontrolledTooltip
-                                                            delay={0}
-                                                            target={`icon1${r._id}`}
-                                                        >
-                                                            Editar
-                                                        </Reactstrap.UncontrolledTooltip>
-                                                        <Reactstrap.Button
-                                                            color="primary"
-                                                            type="button"
-                                                            className="btn-neutral  btn-sm m-3"
-                                                            onClick={() => deletes(r._id)}
-                                                            id={`icon1${r.borrar}`}
-                                                        >
-                                                            <i className="fa-solid fa-trash"></i>
-                                                        </Reactstrap.Button>
-                                                        <Reactstrap.UncontrolledTooltip
-                                                            delay={0}
-                                                            target={`icon1${r.borrar}`}
-                                                        >
-                                                            Eliminar
-                                                        </Reactstrap.UncontrolledTooltip>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ))}
-                                    </tbody>
-                                </Reactstrap.Table>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {data?.map((e) => (
+                                        e?.quarters.map((r, index) => (
+                                            <tr key={r._id}>
+                                                <th>{index + 1}</th>
+                                                <td onClick={() => setQuarter(r)}>{r.number}</td>
+                                                <td>
+                                                    <Reactstrap.Button
+                                                        color="primary"
+                                                        type="button"
+                                                        className="btn-neutral  btn-sm m-0"
+                                                        onClick={() => Edit(r)}
+                                                        id={`icon1${r._id}`}
+                                                    >
+                                                        <i className="fa-solid fa-pencil"></i>
+                                                    </Reactstrap.Button>
+                                                    <Reactstrap.UncontrolledTooltip
+                                                        delay={0}
+                                                        target={`icon1${r._id}`}
+                                                    >
+                                                        Editar
+                                                    </Reactstrap.UncontrolledTooltip>
+                                                    <Reactstrap.Button
+                                                        color="primary"
+                                                        type="button"
+                                                        className="btn-neutral  btn-sm m-3"
+                                                        onClick={() => deletes(r._id)}
+                                                        id={`icon1${r.borrar}`}
+                                                    >
+                                                        <i className="fa-solid fa-trash"></i>
+                                                    </Reactstrap.Button>
+                                                    <Reactstrap.UncontrolledTooltip
+                                                        delay={0}
+                                                        target={`icon1${r.borrar}`}
+                                                    >
+                                                        Eliminar
+                                                    </Reactstrap.UncontrolledTooltip>
+                                                    <Reactstrap.Button
+                                                        color="primary"
+                                                        type="button"
+                                                        className="btn-neutral btn-sm m-0"
+                                                        onClick={toggle3} // Asegúrate de que la función toggle3 controle el estado mostrarBoton
+                                                    >
+                                                        <i className="fa-solid fa-desktop" id="iconoArtefactos" />
+                                                    </Reactstrap.Button>
+                                                    <Reactstrap.UncontrolledTooltip target="iconoArtefactos" placement="bottom">
+                                                        Artefactos
+                                                    </Reactstrap.UncontrolledTooltip>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ))}
+                                </tbody>
+                            </Reactstrap.Table>
                         </Reactstrap.Card>
                     </Reactstrap.Col>
                 </Reactstrap.Row>
