@@ -173,6 +173,44 @@ const ModalResults = ({ isOpen, toggle, type, apiGetC }) => {
                       />
                     </Reactstrap.FormGroup>
                   </Reactstrap.Col>
+                  <Reactstrap.Col md="6">
+                    <Reactstrap.FormGroup className="mb-3">
+                      <label className="form-control-label" htmlFor="input-username">
+                      <span className="text-danger">*</span> Duracion
+                      </label>
+                      <InputValidation
+                        className="form-control-alternative is-invalid"
+                        placeholder="Ej: Meses-Años"
+                        type="text"
+                        name="learning_result"
+                        max="10"
+                        value={data?.learning_result }
+                        minLength={15}
+                        required
+                        onChange={(value) => handleChange(value, 'learning_result')}
+                        setIsValid={setInputValidity}
+                      />
+                    </Reactstrap.FormGroup>
+                  </Reactstrap.Col>
+                  <Reactstrap.Col md="6">
+                    <Reactstrap.FormGroup className="mb-3">
+                      <label className="form-control-label" htmlFor="input-username">
+                      <span className="text-danger">*</span> Trimestre
+                      </label>
+                      <InputValidation
+                        className="form-control-alternative is-invalid"
+                        placeholder="Ej: 1-2-3"
+                        type="number"
+                        name="code"
+                        value={data?._id}
+                        required
+                        onChange={(value) => handleChange(value, '_id')}
+                        setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
+                        isEditable={type === false }
+                      />
+                    </Reactstrap.FormGroup>
+                  </Reactstrap.Col>
+                  
                 </Reactstrap.Row>
 
                 {/*   Botón Registrar */}
