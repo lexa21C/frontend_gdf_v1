@@ -1,41 +1,41 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import * as Reactstrap from "reactstrap";
 import { NavLink as NavLinkRRD } from "react-router-dom";
 import Header from "components/Headers/HEAD.js";
 import PaginationData from "../../components/Pagination/pagination.js";
 import routes from "../../routes.js";
-import Search from "../../components/Search/search";
-import Loading from "../../components/loader/loader.js";
-import ALertModalCuestion from "../../components/Alert/ALertModalCuestion.js";
-import AlertModal from "../../components/Alert/AlertModal.js";
+import Search from "../../components/Search/search"
+import Loading from "../../components/loader/loader.js"
+import ModalResults from "../Competences/CreateResults.js"
+
 
 const Butonn = (routeName, data, name) => {
-  const matchingRoute = routes.find((route) => route.name === routeName);
+  const matchingRoute = routes.find(route => route.name === routeName);
 
   if (!matchingRoute) {
     return null;
   }
 
   const { path, layout, icon, name: routeDisplayName } = matchingRoute;
-
+  
   const getModifiedPath = (path, data, name) => {
     let modifiedPath = path;
-
+    
     if (data !== null) {
       const dataStartIndex = path.indexOf('=/:');
       const dataEndIndex = path.indexOf('/&');
       modifiedPath = `${path.slice(0, dataStartIndex)}=/${data}${path.slice(dataEndIndex)}`;
     }
-
+    
     if (name !== null) {
       const nameStartIndex = modifiedPath.indexOf('&/:');
       modifiedPath = `${modifiedPath.slice(0, nameStartIndex)}&/${name}`;
     }
-
+    
     return modifiedPath;
   };
-
+  
   const modifiedPath = getModifiedPath(path, data, name);
 
   return (
@@ -71,165 +71,72 @@ const Butonn = (routeName, data, name) => {
 export default function List() {
   const [competences, setCompetences] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [name, setName] = useState("");
-  const [id, setId] = useState("");
-  const [operation, setOperation] = useState(1);
-  const [title, setTitle] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
 
-  // Alertas
-  const [alertType, setAlertType] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
-  // Eliminar alerta
-  const [showAlertCuestion, setShowAlertCuestion] = useState(false);
-
-  // Búsqueda
+  //bucador
   const [searchTerm, setSearchTerm] = useState("");
+  const [modal, setModal] = useState(false);
 
-  // Eliminar
-  const [apiDeleteRecord, setApiDeleteRecord] = useState("");
+  const [type, setType] = useState(false)
 
-  // Pagination data
+  //select para editar 
+  const [selectedResult, setSelectedResult] = useState(null);
+  // pagination data
   const totalCompetences = competences.length;
-  const [perPage] = useState(9);
+  const [PerPage] = useState(9);
   const [currentPage, setCurrentPage] = useState(1);
+ 
+  const lastIndex = PerPage  * currentPage; // = 1 * 6 = 6
+  const firstIndex = lastIndex - PerPage; // = 6 - 6 = 0
 
-  const lastIndex = perPage * currentPage;
-  const firstIndex = lastIndex - perPage;
-
-  const toggleModal = () => {
-    setModalOpen(!modalOpen);
-  };
-
-  const handleCloseAlert = () => {
-    setShowAlert(false);
-    setShowAlertCuestion(false);
-  };
-
-  const generateRandomCode = () => {
-    const randomCode = Math.floor(100000000 + Math.random() * 900000000); // Genera un número aleatorio de 9 dígitos
-    return randomCode.toString(); // Convierte el número en una cadena de texto
-  };
-
-  
-
-  const handleSaveClick = () => {
-    // Genera un código aleatorio
-    const newCode = generateRandomCode();
-
-    // Realiza las operaciones necesarias al hacer clic en "Guardar"
-    setAlertType("success"); // Configura el tipo de alerta
-    setAlertMessage("Operación de registro exitosa"); // Configura el mensaje de la alerta
-
-    // Agregar el nuevo elemento con el código aleatorio y versión 1
-    const newCompetence = {
-      labor_competence_code: newCode,
-      labor_competition: name,
-      labor_competition_version: 1, // Versión inicial en 1
-      // Otros campos de la nueva competencia
-    };
-
-    // Agregar la nueva competencia al principio de la lista
-    setCompetences([newCompetence, ...competences]);
-
-    // Guardar los datos en localStorage
-    localStorage.setItem("competences", JSON.stringify([newCompetence, ...competences]));
-
-    setShowAlert(true); // Muestra la alerta
-    setModalOpen(false); // Cierra el modal de creación de competencia
-
-    // Reiniciar la página actual a la primera página
-    setCurrentPage(1);
-  };
-
-  const openModal = (op, id, name) => {
-    setId(id);
-    setName(name);
-    setOperation(op);
-
-    if (op === 1) {
-      setTitle("Registrar Competencia");
-    } else if (op === 2) {
-      setTitle("Editar Competencia");
-    }
-
-    setModalOpen(true);
-  };
-
-  const getData = useCallback(() => {
+  const toggle = () => {
+    setModal(!modal);
+    setType(false);
+  }
+ 
+  const getData = () => {
     try {
-      axios.get(`api/v1/competences/${id}`).then((res) => {
-        setCompetences(res.data.results);
-        setIsLoading(false);
-      });
+      axios.get("api/v1/competences")
+        .then((res) => {
+          setCompetences(res.data.results);
+          setTimeout(()=>{
+            setIsLoading(false)
+          },500)
+        })
     } catch (error) {
-      setAlertType(error.status);
-      setAlertMessage(error.message);
-      setShowAlert(true);
-      console.log(error);
+      console.log(error)
     }
-  }, [id]);
+  }
 
-  const handleInputChange = (event) => {
+  const handleInputChange = event => {
     setSearchTerm(event.target.value);
   };
 
-  const handleDeleteConfirmation = () => {
-    axios
-      .delete(apiDeleteRecord)
-      .then((response) => {
-        // Verifica si la solicitud de eliminación fue exitosa
-        if (response.status === 200) {
-          // La competencia se eliminó con éxito, ahora actualiza el estado para reflejar la eliminación
-          const updatedCompetences = competences.filter((competence) => competence._id !== id);
-          setCompetences(updatedCompetences);
-          setShowAlertCuestion(false); // Cierra la alerta de confirmación
-        } else {
-          // Maneja cualquier otro resultado (por ejemplo, un error en la eliminación)
-          console.error("Error en la eliminación de la competencia:", response.data);
-        }
-      })
-      .catch((error) => {
-        console.error("Error en la solicitud de eliminación:", error);
-      });
-  };
-
-  const destroy = (id) => {
-    setApiDeleteRecord(`api/v1/competences/${id}`);
-    setShowAlertCuestion(true);
-  };
-
   useEffect(() => {
-    const storedCompetences = localStorage.getItem("competences");
-    if (storedCompetences) {
-      setCompetences(JSON.parse(storedCompetences));
-      setIsLoading(false);
-    } else {
-      // Realiza la solicitud inicial para obtener los datos si no hay datos en localStorage
-      getData();
-    }
-  }, [getData]);
+    getData()
+  }, [searchTerm]);
 
+ 
   return (
-    <>
-      {isLoading && <Loading />}
+    <>    
+
+     {isLoading && <Loading  />}
+    
+    
       <Header title1="Gestionar Competencias" />
       <Reactstrap.Container className="mt--7" fluid>
         <Reactstrap.Row>
           <div className="col">
             <Reactstrap.Card className="shadow">
               <Reactstrap.CardHeader className="border-0">
-                <Reactstrap.Button
-                  color="primary"
-                  className="btn-circle btn-neutral"
-                  onClick={() => openModal(1, "", "")}
+                
+              <Reactstrap.Button color="primary"
                   type="button"
-                >
-                  <i className="ni ni-fat-add"></i>
+                  className="btn-circle btn-neutral "
+                  onClick={toggle}>
+                  <i className="ni ni-fat-add" />
                 </Reactstrap.Button>
-                {/* Utilizar el componente SearchBar */}
-                <Search
+                  {/* Utilizar el componente SearchBar */}
+                  <Search
                   searchTerm={searchTerm}
                   handleInputChange={handleInputChange}
                   placeholder="Buscar Competencia"
@@ -246,115 +153,70 @@ export default function List() {
                     <th scope="col" />
                   </tr>
                 </thead>
-                <tbody>
+                <tbody >
                   {competences
-                    .filter((competence) =>
-                      Object.values(competence)
-                        .join(" ")
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase())
-                    )
-                    .slice(firstIndex, lastIndex)
-                    .map((data, index) => {
-                      return (
-                        <tr key={index}>
-                          <th>{index + 1}</th>
-                          <td>{data.labor_competence_code}</td>
-                          <th scope="row">
-                            <Reactstrap.Media className="align-items-center">
-                              <div className="ml-10 text-sm " id={`t2${data._id}`}>
-                                <Reactstrap.UncontrolledTooltip target={`t2${data._id}`}>
-                                  {data.labor_competition}
-                                </Reactstrap.UncontrolledTooltip>
-                                {data.labor_competition.length > 95
-                                  ? data.labor_competition.slice(0, 95) + "..."
-                                  : data.labor_competition}
-                              </div>
-                            </Reactstrap.Media>
-                          </th>
-                          <td>{data.labor_competition_version}</td>
-                          <td>
-                            <Reactstrap.UncontrolledDropdown>
-                              {Butonn("Resultados de aprendizaje", data._id, data.labor_competition)}
-                            </Reactstrap.UncontrolledDropdown>
-                            <Reactstrap.Button
-                              color="primary"
-                              type="button"
-                              className="btn-neutral btn-sm"
-                              onClick={() => destroy(data._id)}
-                              id={`icon2${data._id}`}
-                            >
-                              <i className="fa-solid fa-trash"></i>
-                            </Reactstrap.Button>
-                          </td>
-                        </tr>
-                      );
-                    })}
+            .filter((competence) =>
+              Object.values(competence)
+                .join(" ")
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase())
+            )
+            .slice(firstIndex, lastIndex)
+                  .map((data, index ) => {
+                    return (
+                      <tr key={index}>
+                        <th>{index + 1}</th>
+                        <td>{data.labor_competence_code}</td>
+                        
+                        <th scope="row">
+                          <Reactstrap.Media className="align-items-center">
+                            <div className="ml-10 text-sm " id={`t2${data._id}`}>
+                              <Reactstrap.UncontrolledTooltip target={`t2${data._id}`}>
+                                {data.labor_competition}
+                              </Reactstrap.UncontrolledTooltip>
+                              {data.labor_competition.length > 95 ?
+                                data.labor_competition.slice(0, 95) + '...' : data.labor_competition}
+                            </div>
+
+
+                          </Reactstrap.Media>
+                        </th>
+                        <td>{data.labor_competition_version}</td>
+
+                        <td>
+                          <Reactstrap.UncontrolledDropdown>
+                            {Butonn('Resultados de aprendizaje', data._id, data.labor_competition)}
+                          </Reactstrap.UncontrolledDropdown>
+                        </td>
+                      </tr>
+                    );
+                  })
+                  }
+
                 </tbody>
               </Reactstrap.Table>
               <Reactstrap.CardFooter className="py-4">
                 <nav aria-label="...">
                   <PaginationData
-                    PerPage={perPage}
+                    PerPage={PerPage}
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
                     total={totalCompetences}
                   />
                 </nav>
               </Reactstrap.CardFooter>
-
-              {/* Modal Crear categoría */}
-              <Reactstrap.Modal
-                className="modal-lg modal-dialog-centered"
-                isOpen={modalOpen}
-                toggle={toggleModal}
-                style={{ width: "50%" }}
-              >
-                <Reactstrap.ModalHeader toggle={toggleModal}>
-                  <label className="h5">{title}</label>
-                </Reactstrap.ModalHeader>
-                <Reactstrap.ModalBody>
-                  <Reactstrap.InputGroup className="mb-3">
-                    <Reactstrap.InputGroupAddon addonType="prepend">
-                      <span className="input-group-text">
-                        <i className="fa-solid fa-gift"></i>
-                      </span>
-                    </Reactstrap.InputGroupAddon>
-                    <Reactstrap.Input
-                      type="text"
-                      id="nombre"
-                      className="form-control"
-                      placeholder="Categoría"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </Reactstrap.InputGroup>
-                </Reactstrap.ModalBody>
-                <div className="text-center">
-                  <Reactstrap.Button
-                    color="primary"
-                    className="btn-primary mb-4"
-                    type="submit"
-                    onClick={handleSaveClick}
-                  >
-                    Guardar
-                  </Reactstrap.Button>
-                </div>
-              </Reactstrap.Modal>
+              {/* Modal crear */}
+              <ModalResults
+                isOpen={modal}
+                toggle={toggle}
+                type={type}
+                learning_result={selectedResult}
+                apiGetC={`api/v1/learningResults/show/${selectedResult?._id}`}
+              />
             </Reactstrap.Card>
           </div>
         </Reactstrap.Row>
       </Reactstrap.Container>
-      {showAlert && (
-        <AlertModal type={alertType} message={alertMessage} onClose={handleCloseAlert} />
-      )}
-      {showAlertCuestion && (
-        <ALertModalCuestion
-          api={apiDeleteRecord}
-          onClose={handleCloseAlert}
-          onConfirm={handleDeleteConfirmation} // Llama a la función de eliminación
-        />
-      )}
     </>
   );
 }
