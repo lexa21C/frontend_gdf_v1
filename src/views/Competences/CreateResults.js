@@ -1,241 +1,129 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import * as Reactstrap from "reactstrap";
-import { useParams } from "react-router-dom";
-import AlertModal from '../../components/Alert/AlertModal.js'
-import InputValidation from '../../Helpers/validacion.js'
+import React, { useState } from 'react';
+import * as Reactstrap from 'reactstrap';
+import Select from "react-select";
 
-const ModalResults = ({ isOpen, toggle, type, apiGetC }) => {
-  const [data, setData] = useState({});
+export default function Modal({ isOpen, toggle, competences }) {
+    const [selectedOptions, setSelectedOptions] = useState([]);
+    const [programCode, setProgramCode] = useState("");
+    const [duration, setDuration] = useState("");
+    const [trimester, setTrimester] = useState("");
 
-  // alertas
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertType, setAlertType] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
+    const options = competences.map((competence, index) => ({
+        value: competence._id,
+        label: `${index + 1}.${competence.labor_competition}`,
+    }));
 
-  //validación del formulario
-  const [isValidForm, setIsValidForm] = useState(true);
- 
-
-  // Función para actualizar el estado isValidForm
-  const setInputValidity = (isValid) => {
-    setIsValidForm(isValid);
-  };
-
-  //id competencia
-  const { competenceid } = useParams();
-
-  //estados de titulos y botones
-  const [title, setTitle] = useState("");
-  const [nameButton, setNameButton] = useState("");
-
-  useEffect(() => {
-    if (type === true) {  
-      const fetchData = async () => {
-        const { data } = await axios.get(apiGetC);
-        setData(data.results);
-      };
-      fetchData();
-      setTitle("Editar");
-      setNameButton("Actualizar");
-
-    } else {
-      setData({
-        _id: "",
-        learning_result: "",
-        competence: competenceid
-      });
-      setTitle("Registrar");
-      setNameButton("Registrar");
+    const handleSelectChange = (selectedOption) => {
+        setSelectedOptions(selectedOption);
     };
-  }, [type, apiGetC, competenceid]);
 
-  const handleChange = (value, fieldName) => {
-    setData({ ...data, [fieldName]: value });
-  };
-  //alertas
-  const handleCloseAlert = () => {
-    setShowAlert(false);
-  };
+    const handleProgramCodeChange = (e) => {
+        setProgramCode(e.target.value);
+    };
+    const handleSaveClick = () => {}
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+    const handleDurationChange = (e) => {
+        setDuration(e.target.value);
+    };
 
-    //validación del formulario
-    if (!isValidForm) {
-      // Si hay algún error de validación, no envíes el formulario
-      return;
-    }
+    const handleTrimesterChange = (e) => {
+        setTrimester(e.target.value);
+    };
 
-    if (type === false) {
-      
-      
-      axios.post('api/v1/learningResults', data).then(
-        (res) => {
-          if (res.data.status === 'success') {
+    const isFormValid = () => {
+        // Validar las restricciones
+        const isProgramCodeValid = programCode.length >= 15;
+        const isDurationValid = duration.length >= 15;
+        const isTrimesterValid = !isNaN(trimester);
 
-            toggle(!toggle);
+        return isProgramCodeValid && isDurationValid && isTrimesterValid;
+    };
 
-            setData({
-              _id: "",
-              learning_result: "",
-              competence: competenceid
-            })
-          }
-          setAlertType(res.data.status);
-          setAlertMessage(res.data.message);
-          setShowAlert(true);
-
-        }
-
-      ).catch((err) => {
-        setAlertType(err.status);
-        setAlertMessage(err.message);
-        setShowAlert(true);
-      });
-    } else {
-     
-      const { data: res } = axios.put(`api/v1/learningResults/${data._id}`, data).then((res)=>{
-        console.log(res.data.status)
-        if (res.data.status === 'success') {
-
-          toggle(!toggle);
-        }
-        setAlertType(res.data?.status);
-        setAlertMessage(res.data?.message);
-        setShowAlert(true);
-        console.log(res.data?.message)
-      }).catch((err)=>{
-        setAlertType(err.status);
-        setAlertMessage(err.message);
-        setShowAlert(true);
-      });
-
-    }
-
-  };
-
-  return (
-    <>
-      <Reactstrap.Modal
-        className="modal-lg"
-        style={{ marginTop: "18vh" }}
-        isOpen={isOpen}
-        toggle={toggle}
-      >
-        <div className="modal-body p-0">
-          <Reactstrap.Card className="bg-secondary shadow border-0">
-            <Reactstrap.CardHeader className="bg-transparent pb-1">
-              <Reactstrap.ModalHeader toggle={toggle} className="col-12 p-0">
-                <div className="d-flex flex-wrap ">
-                  <h4>{title}   Competencia</h4>
-                </div>
-              </Reactstrap.ModalHeader>
-            </Reactstrap.CardHeader>
-            <Reactstrap.CardBody className="px-lg-5 py-lg-5">
-              <Reactstrap.Form onSubmit={handleSubmit}>
-                <Reactstrap.Row>
-                  <Reactstrap.Col md="6">
-                    <Reactstrap.FormGroup className="mb-3">
-                      <label className="form-control-label" htmlFor="input-username">
-                      <span className="text-danger">*</span> Codigo del programa
-                      </label>
-                      <InputValidation
-                        className="form-control-alternative is-invalid"
-                        placeholder="Ej: 52698"
-                        type="number"
-                        name="code"
-                        value={data?._id}
-                        required
-                        onChange={(value) => handleChange(value, '_id')}
-                        setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
-                        isEditable={type === false }
-                      />
-                    </Reactstrap.FormGroup>
-                  </Reactstrap.Col>
-
-                  <Reactstrap.Col md="6">
-                    <Reactstrap.FormGroup className="mb-3">
-                      <label className="form-control-label" htmlFor="input-username">
-                      <span className="text-danger">*</span> Nombre de la competencia
-                      </label>
-                      <InputValidation
-                        className="form-control-alternative is-invalid"
-                        placeholder="Ej: MEJORAMIENTO PROGRAMAS DE DESARROLLO"
-                        type="text"
-                        name="learning_result"
-                        max="10"
-                        value={data?.learning_result }
-                        minLength={15}
-                        required
-                        onChange={(value) => handleChange(value, 'learning_result')}
-                        setIsValid={setInputValidity}
-                      />
-                    </Reactstrap.FormGroup>
-                  </Reactstrap.Col>
-                  <Reactstrap.Col md="6">
-                    <Reactstrap.FormGroup className="mb-3">
-                      <label className="form-control-label" htmlFor="input-username">
-                      <span className="text-danger">*</span> Duracion
-                      </label>
-                      <InputValidation
-                        className="form-control-alternative is-invalid"
-                        placeholder="Ej: Meses-Años"
-                        type="text"
-                        name="learning_result"
-                        max="10"
-                        value={data?.learning_result }
-                        minLength={15}
-                        required
-                        onChange={(value) => handleChange(value, 'learning_result')}
-                        setIsValid={setInputValidity}
-                      />
-                    </Reactstrap.FormGroup>
-                  </Reactstrap.Col>
-                  <Reactstrap.Col md="6">
-                    <Reactstrap.FormGroup className="mb-3">
-                      <label className="form-control-label" htmlFor="input-username">
-                      <span className="text-danger">*</span> Trimestre
-                      </label>
-                      <InputValidation
-                        className="form-control-alternative is-invalid"
-                        placeholder="Ej: 1-2-3"
-                        type="number"
-                        name="code"
-                        value={data?._id}
-                        required
-                        onChange={(value) => handleChange(value, '_id')}
-                        setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
-                        isEditable={type === false }
-                      />
-                    </Reactstrap.FormGroup>
-                  </Reactstrap.Col>
-                  
-                </Reactstrap.Row>
-
-                {/*   Botón Registrar */}
-                <div className="text-center">
-                  <Reactstrap.Button
-                    className="my-4"
-                    color="primary"
-                    type="submit"
-                  > 
-                    {nameButton}
-                  </Reactstrap.Button>
-
-                </div>
-              </Reactstrap.Form>
-            </Reactstrap.CardBody>
-          </Reactstrap.Card>
-        </div>
-      </Reactstrap.Modal>
-
-      {showAlert && (
-        <AlertModal type={alertType} message={alertMessage} onClose={handleCloseAlert} />
-      )}
-    </>
-
-  );
-};
-
-export default ModalResults;
+    return (
+        <Reactstrap.Modal
+            className="modal-dialog-centered"
+            isOpen={isOpen}
+            toggle={toggle}
+        >
+            <div className="modal-body p-0">
+                <Reactstrap.Card className="bg-secondary shadow border-0">
+                    <Reactstrap.CardHeader className="bg-transparent pb-1">
+                        <Reactstrap.ModalHeader toggle={toggle}>
+                            <h4>Registrar Competencia</h4>
+                        </Reactstrap.ModalHeader>
+                    </Reactstrap.CardHeader>
+                    <Reactstrap.CardBody className="px-lg-5 py-lg-5">
+                        <Reactstrap.Form>
+                            <Reactstrap.FormGroup className="mb-3">
+                                <label
+                                    className="form-control-label"
+                                    htmlFor="input-competences"
+                                >
+                                    Competencias
+                                </label>
+                                <Select
+                                    options={options}
+                                    value={selectedOptions}
+                                    isMulti
+                                    onChange={handleSelectChange}
+                                />
+                            </Reactstrap.FormGroup>
+                            <Reactstrap.FormGroup>
+                                <label htmlFor="input-programCode">Código del Programa</label>
+                                <Reactstrap.Input
+                                    type="text"
+                                    id="input-programCode"
+                                    placeholder="Ejemplo: 147837"
+                                    onChange={handleProgramCodeChange}
+                                    value={programCode}
+                                    required
+                                />
+                            </Reactstrap.FormGroup>
+                            <Reactstrap.FormGroup>
+                                <label htmlFor="input-duration">Duración</label>
+                                <Reactstrap.Input
+                                    type="text"
+                                    id="input-duration"
+                                    placeholder="Ejemplo: meses-años"
+                                    onChange={handleDurationChange}
+                                    value={duration}
+                                    required
+                                />
+                            </Reactstrap.FormGroup>
+                            <Reactstrap.FormGroup>
+                                <label htmlFor="input-trimester">Trimestre</label>
+                                <Reactstrap.Input
+                                    type="number"
+                                    placeholder="Ejemplo: 1-2-3"
+                                    id="input-trimester"
+                                    onChange={handleTrimesterChange}
+                                    value={trimester}
+                                    required
+                                />
+                            </Reactstrap.FormGroup>
+                            <div className="text-center">
+                                <Reactstrap.Button
+                                    className="my-4"
+                                    color="primary"
+                                    type="button"
+                                    onClick={toggle}
+                                >
+                                    Cerrar
+                                </Reactstrap.Button>
+                                <Reactstrap.Button
+                                    className="my-4"
+                                    color="primary"
+                                    type="button"
+                                    onClick={handleSaveClick}
+                                    disabled={!isFormValid()}
+                                >
+                                    Registrar
+                                </Reactstrap.Button>
+                            </div>
+                        </Reactstrap.Form>
+                    </Reactstrap.CardBody>
+                </Reactstrap.Card>
+            </div>
+        </Reactstrap.Modal>
+    );
+}
