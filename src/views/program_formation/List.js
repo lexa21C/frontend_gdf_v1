@@ -9,6 +9,7 @@ import { NavLink } from "react-router-dom";
 import routes from "../../routes.js";
 import Search from "../../components/Search/search"
 import Loading from "../../components/loader/loader.js"
+import Modal from "../program_formation/CreateProgram.js"
 
 const Butonn = (routeName, data, name) => {
   const matchingRoute = routes.find((route) => route.name === routeName);
@@ -77,12 +78,21 @@ async function getData(_id) {
 
 export default function List() {
   const [program, setProgram] = useState([]);
+  const [programs, setPrograms] = useState([]);
+
+  const [modalOpen, setmodal] = useState();
+  const [toggleModal, setmodalt] = useState();
   //bucador
   const [searchTerm, setSearchTerm] = useState("");
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const [modal, setModal] = useState(false);
 
+  const [type, setType] = useState(false)
+
+  //select para editar 
+  const [selectedResult, setSelectedResult] = useState(null);
   // pagination data
   const totalProgram = program?.length;
   const [PerPage] = useState(5);
@@ -96,6 +106,12 @@ export default function List() {
   const handleInputChange = (event) => {
     setSearchTerm(event.target.value);
   };
+
+  const toggle = () => {
+    setModal(!modal);
+    setType(false);
+  }
+ 
 
   useEffect(() => {
     async function fetchData() {
@@ -117,6 +133,12 @@ export default function List() {
           <div className="col">
             <Reactstrap.Card className="shadow">
               <Reactstrap.CardHeader className="border-0">
+              <Reactstrap.Button color="primary"
+                  type="button"
+                  className="btn-circle btn-neutral "
+                  onClick={toggle}>
+                  <i className="ni ni-fat-add" />
+                </Reactstrap.Button>
                 {/* Utilizar el componente SearchBar */}
                 <Search
                   searchTerm={searchTerm}
@@ -189,6 +211,7 @@ export default function List() {
                   />
                 </nav>
               </Reactstrap.CardFooter>
+              <Modal isOpen={modalOpen} toggle={toggleModal} programs={ programs } />
             </Reactstrap.Card>
           </div>
         </Reactstrap.Row>
