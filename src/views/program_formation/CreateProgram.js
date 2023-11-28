@@ -1,129 +1,110 @@
-import React, { useState } from 'react';
-import * as Reactstrap from 'reactstrap';
+import React, { useState, useEffect } from 'react';
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input, Label } from 'reactstrap';
 import Select from "react-select";
+import axios from 'axios';
 
-export default function Modal({ isOpen, toggle, programs }) {
-    const [selectedOptions, setSelectedOptions] = useState([]);
-    const [programCode, setProgramCode] = useState("");
-    const [duration, setDuration] = useState("");
-    const [trimester, setTrimester] = useState("");
+const CreateProgramModal = ({ isOpen, toggle, handleSaveClick }) => {
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [programCode, setProgramCode] = useState("");
+  const [duration, setDuration] = useState("");
+  const [programLevel, setProgramLevel] = useState("");
+  const [programData, setProgramData] = useState([]);
 
-    const options = programs.map((programs, index) => ({
-        value: programs._id,
-        label: `${index + 1}.${programs.program_code}`,
-    }));
+  const handleSelectChange = (selectedOption) => {
+    setSelectedOption(selectedOption);
+  };
 
-    const handleSelectChange = (selectedOption) => {
-        setSelectedOptions(selectedOption);
+  const handleProgramCodeChange = (e) => {
+    setProgramCode(e.target.value);
+  };
+
+  const handleDurationChange = (e) => {
+    setDuration(e.target.value);
+  };
+
+  const handleProgramLevelChange = (e) => {
+    setProgramLevel(e.target.value);
+  };
+
+  const isFormValid = () => {
+    const isProgramCodeValid = programCode.length >= 6;
+    const isDurationValid = duration.length > 0;
+    const isProgramLevelValid = programLevel.length > 0;
+
+    return isProgramCodeValid && isDurationValid && isProgramLevelValid;
+  };
+
+  useEffect(() => {
+    const fetchProgramData = async () => {
+      try {
+        const response = await axios.get('/api/v1/formation_programs');
+        setProgramData(response.data.results);
+      } catch (error) {
+        console.error("Error fetching program data:", error);
+      }
     };
 
-    const handleProgramCodeChange = (e) => {
-        setProgramCode(e.target.value);
-    };
-    const handleSaveClick = () => {}
+    fetchProgramData();
+  }, []);
 
-    const handleDurationChange = (e) => {
-        setDuration(e.target.value);
-    };
+  const options = programData.map((program) => ({
+    value: program._id,
+    label: program.program_name,
+  }));
 
-    const handleTrimesterChange = (e) => {
-        setTrimester(e.target.value);
-    };
-
-    const isFormValid = () => {
-        // Validar las restricciones
-        const isProgramCodeValid = programCode.length >= 15;
-        const isDurationValid = duration.length >= 15;
-        const isTrimesterValid = !isNaN(trimester);
-
-        return isProgramCodeValid && isDurationValid && isTrimesterValid;
-    };
-
-    return (
-        <Reactstrap.Modal
-            className="modal-dialog-centered"
-            isOpen={isOpen}
-            toggle={toggle}
+  return (
+    <Modal isOpen={isOpen} toggle={toggle} centered>
+      <ModalHeader toggle={toggle}>Registrar Programa</ModalHeader>
+      <ModalBody>
+        <Label htmlFor="input-formation_programs">Programa</Label>
+        <Select
+          id="select-programs"
+          options={options}
+          value={selectedOption}
+          onChange={handleSelectChange}
+        />
+        <Label for="input-programCode">Código del Programa (más de 6 dígitos)</Label>
+         <Input
+          type="number"
+          id="input-programCode"
+          placeholder="Ejemplo: 147837"
+          onChange={handleProgramCodeChange}
+          value={programCode}
+          required
+        />
+        <Label for="input-duration">Duración</Label>
+        <Input
+          type="text"
+          id="input-duration"
+          placeholder="Ejemplo: meses-años"
+          onChange={handleDurationChange}
+          value={duration}
+          required
+        />
+        <Label for="input-programLevel">Nivel de Programa</Label>
+        <Input
+          type="text"
+          id="input-programLevel"
+          placeholder="Ejemplo:Tecnologo"
+          onChange={handleProgramLevelChange}
+          value={programLevel}
+          required
+        />
+      </ModalBody>
+      <ModalFooter>
+        <Button color="secondary" onClick={toggle}>
+          Cerrar
+        </Button>
+        <Button
+          color="primary"
+          onClick={() => handleSaveClick(selectedOption)}
+          disabled={!isFormValid()}
         >
-            <div className="modal-body p-0">
-                <Reactstrap.Card className="bg-secondary shadow border-0">
-                    <Reactstrap.CardHeader className="bg-transparent pb-1">
-                        <Reactstrap.ModalHeader toggle={toggle}>
-                            <h4>Registrar Competencia</h4>
-                        </Reactstrap.ModalHeader>
-                    </Reactstrap.CardHeader>
-                    <Reactstrap.CardBody className="px-lg-5 py-lg-5">
-                        <Reactstrap.Form>
-                            <Reactstrap.FormGroup className="mb-3">
-                                <label
-                                    className="form-control-label"
-                                    htmlFor="input-programs"
-                                >
-                                    Competencias
-                                </label>
-                                <Select
-                                    options={options}
-                                    value={selectedOptions}
-                                    isMulti
-                                    onChange={handleSelectChange}
-                                />
-                            </Reactstrap.FormGroup>
-                            <Reactstrap.FormGroup>
-                                <label htmlFor="input-programCode">Código del Programa</label>
-                                <Reactstrap.Input
-                                    type="text"
-                                    id="input-programCode"
-                                    placeholder="Ejemplo: 147837"
-                                    onChange={handleProgramCodeChange}
-                                    value={programCode}
-                                    required
-                                />
-                            </Reactstrap.FormGroup>
-                            <Reactstrap.FormGroup>
-                                <label htmlFor="input-duration">Duración</label>
-                                <Reactstrap.Input
-                                    type="text"
-                                    id="input-duration"
-                                    placeholder="Ejemplo: meses-años"
-                                    onChange={handleDurationChange}
-                                    value={duration}
-                                    required
-                                />
-                            </Reactstrap.FormGroup>
-                            <Reactstrap.FormGroup>
-                                <label htmlFor="input-trimester">Trimestre</label>
-                                <Reactstrap.Input
-                                    type="number"
-                                    placeholder="Ejemplo: 1-2-3"
-                                    id="input-trimester"
-                                    onChange={handleTrimesterChange}
-                                    value={trimester}
-                                    required
-                                />
-                            </Reactstrap.FormGroup>
-                            <div className="text-center">
-                                <Reactstrap.Button
-                                    className="my-4"
-                                    color="primary"
-                                    type="button"
-                                    onClick={toggle}
-                                >
-                                    Cerrar
-                                </Reactstrap.Button>
-                                <Reactstrap.Button
-                                    className="my-4"
-                                    color="primary"
-                                    type="button"
-                                    onClick={handleSaveClick}
-                                    disabled={!isFormValid()}
-                                >
-                                    Registrar
-                                </Reactstrap.Button>
-                            </div>
-                        </Reactstrap.Form>
-                    </Reactstrap.CardBody>
-                </Reactstrap.Card>
-            </div>
-        </Reactstrap.Modal>
-    );
-}
+          Registrar
+        </Button>
+      </ModalFooter>
+    </Modal>
+  );
+};
+
+export default CreateProgramModal;
