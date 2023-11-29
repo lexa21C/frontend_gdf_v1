@@ -107,8 +107,15 @@ export default function List() {
     setSearchTerm(event.target.value);
   };
 
-  const toggle = () => {
+    const toggle = (callback) => {
     setModalOpen(!modalOpen);
+    if (callback && typeof callback === 'function') {
+      callback(); // Llamar al callback después de cerrar el modal
+    }
+  };
+
+  const addProgram = (newProgram) => {
+    setProgram((prevPrograms) => [...prevPrograms, newProgram]);
   };
 
   useEffect(() => {
@@ -212,14 +219,10 @@ export default function List() {
                 </nav>
               </Reactstrap.CardFooter>
               <CreateProgramModal
-                isOpen={modalOpen}
-                toggle={toggle}
-                programs={programs}
-                handleSaveClick={() => {
-                  // Lógica para guardar el nuevo programa
-                  // Puedes implementar esta lógica según tus necesidades
-                }}
-              />
+        isOpen={modalOpen}
+        toggle={() => setModalOpen(!modalOpen)}
+        setPrograms={setProgram} 
+      />
             </Reactstrap.Card>
           </div>
         </Reactstrap.Row>

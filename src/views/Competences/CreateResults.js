@@ -1,129 +1,124 @@
-import React, { useState } from 'react';
-import * as Reactstrap from 'reactstrap';
-import Select from "react-select";
+import React, { useState, useEffect } from 'react';
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input, Label } from 'reactstrap';
+import Select from 'react-select';
+import axios from 'axios';
 
-export default function Modal({ isOpen, toggle, competences }) {
-    const [selectedOptions, setSelectedOptions] = useState([]);
-    const [programCode, setProgramCode] = useState("");
-    const [duration, setDuration] = useState("");
-    const [trimester, setTrimester] = useState("");
+const CombinedModal = ({ isOpen, toggle, competences, setPrograms, updatePrograms }) => {
+  const [selectedOption, setSelectedOption] = useState('');
+  const [programCode, setProgramCode] = useState('');
+  const [duration, setDuration] = useState('');
+  const [trimester, setTrimester] = useState('');
 
-    const options = competences.map((competence, index) => ({
-        value: competence._id,
-        label: `${index + 1}.${competence.labor_competition}`,
-    }));
+  const options = competences.map((competence, index) => ({
+    value: competence._id,
+    label: `${index + 1}.${competence.labor_competition}`,
+  }));
 
-    const handleSelectChange = (selectedOption) => {
-        setSelectedOptions(selectedOption);
+  const handleSelectChange = (selectedOption) => {
+    setSelectedOption(selectedOption);
+  };
+
+  const handleProgramCodeChange = (e) => {
+    setProgramCode(e.target.value);
+  };
+
+  const handleDurationChange = (e) => {
+    setDuration(e.target.value);
+  };
+
+  const handleTrimesterChange = (e) => {
+    setTrimester(e.target.value);
+  };
+
+  const handleSave = async () => {
+    try {
+      const newCompetence = {
+        labor_competition: selectedOption.label, // Cambié el campo a 'labor_competition'
+        // Puedes agregar otros campos necesarios para la competencia
+      };
+
+      // Enviar la solicitud para crear la nueva competencia en el servidor
+      const response = await axios.post('/api/v1/competences', newCompetence);
+
+      if (response.status === 201) {
+        console.log("Competencia registrada exitosamente:", newCompetence);
+
+        // Limpiar el estado del formulario
+        setSelectedOption('');
+        setProgramCode('');
+        setDuration('');
+        setTrimester('');
+
+        // Cerrar el modal
+        toggle();
+      } else {
+        console.error("Error al crear la competencia. Estado de respuesta:", response.status);
+      }
+    } catch (error) {
+      console.error("Error al guardar el registro:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchProgramData = async () => {
+      try {
+        const response = await axios.get('/api/v1/formation_programs');
+        // Hacer algo con los datos obtenidos si es necesario
+      } catch (error) {
+        console.error("Error fetching program data:", error);
+      }
     };
 
-    const handleProgramCodeChange = (e) => {
-        setProgramCode(e.target.value);
-    };
-    const handleSaveClick = () => {}
+    fetchProgramData();
+  }, [toggle]);
 
-    const handleDurationChange = (e) => {
-        setDuration(e.target.value);
-    };
+  return (
+    <Modal isOpen={isOpen} toggle={toggle} centered>
+      <ModalHeader toggle={toggle}>Registrar Competencia</ModalHeader>
+      <ModalBody>
+        <Label htmlFor="input-competences">Competencias</Label>
+        <Select options={options} value={selectedOption} onChange={handleSelectChange} />
 
-    const handleTrimesterChange = (e) => {
-        setTrimester(e.target.value);
-    };
+        <Label for="input-programCode">Código del Programa</Label>
+        <Input
+          type="text"
+          id="input-programCode"
+          placeholder="Ejemplo: 147837"
+          onChange={handleProgramCodeChange}
+          value={programCode}
+          required
+        />
 
-    const isFormValid = () => {
-        // Validar las restricciones
-        const isProgramCodeValid = programCode.length >= 15;
-        const isDurationValid = duration.length >= 15;
-        const isTrimesterValid = !isNaN(trimester);
+        <Label for="input-duration">Duración</Label>
+        <Input
+          type="text"
+          id="input-duration"
+          placeholder="Ejemplo: meses-años"
+          onChange={handleDurationChange}
+          value={duration}
+          required
+        />
 
-        return isProgramCodeValid && isDurationValid && isTrimesterValid;
-    };
+        <Label for="input-trimester">Trimestre</Label>
+        <Input
+          type="number"
+          placeholder="Ejemplo: 1-2-3"
+          id="input-trimester"
+          onChange={handleTrimesterChange}
+          value={trimester}
+          required
+        />
+      </ModalBody>
+      <ModalFooter>
+        <Button color="secondary" onClick={toggle}>
+          Cerrar
+        </Button>
+        <Button color="primary" onClick={handleSave}>
+          Registrar
+        </Button>
+      </ModalFooter>
+    </Modal>
+  );
+};
 
-    return (
-        <Reactstrap.Modal
-            className="modal-dialog-centered"
-            isOpen={isOpen}
-            toggle={toggle}
-        >
-            <div className="modal-body p-0">
-                <Reactstrap.Card className="bg-secondary shadow border-0">
-                    <Reactstrap.CardHeader className="bg-transparent pb-1">
-                        <Reactstrap.ModalHeader toggle={toggle}>
-                            <h4>Registrar Competencia</h4>
-                        </Reactstrap.ModalHeader>
-                    </Reactstrap.CardHeader>
-                    <Reactstrap.CardBody className="px-lg-5 py-lg-5">
-                        <Reactstrap.Form>
-                            <Reactstrap.FormGroup className="mb-3">
-                                <label
-                                    className="form-control-label"
-                                    htmlFor="input-competences"
-                                >
-                                    Competencias
-                                </label>
-                                <Select
-                                    options={options}
-                                    value={selectedOptions}
-                                    isMulti
-                                    onChange={handleSelectChange}
-                                />
-                            </Reactstrap.FormGroup>
-                            <Reactstrap.FormGroup>
-                                <label htmlFor="input-programCode">Código del Programa</label>
-                                <Reactstrap.Input
-                                    type="text"
-                                    id="input-programCode"
-                                    placeholder="Ejemplo: 147837"
-                                    onChange={handleProgramCodeChange}
-                                    value={programCode}
-                                    required
-                                />
-                            </Reactstrap.FormGroup>
-                            <Reactstrap.FormGroup>
-                                <label htmlFor="input-duration">Duración</label>
-                                <Reactstrap.Input
-                                    type="text"
-                                    id="input-duration"
-                                    placeholder="Ejemplo: meses-años"
-                                    onChange={handleDurationChange}
-                                    value={duration}
-                                    required
-                                />
-                            </Reactstrap.FormGroup>
-                            <Reactstrap.FormGroup>
-                                <label htmlFor="input-trimester">Trimestre</label>
-                                <Reactstrap.Input
-                                    type="number"
-                                    placeholder="Ejemplo: 1-2-3"
-                                    id="input-trimester"
-                                    onChange={handleTrimesterChange}
-                                    value={trimester}
-                                    required
-                                />
-                            </Reactstrap.FormGroup>
-                            <div className="text-center">
-                                <Reactstrap.Button
-                                    className="my-4"
-                                    color="primary"
-                                    type="button"
-                                    onClick={toggle}
-                                >
-                                    Cerrar
-                                </Reactstrap.Button>
-                                <Reactstrap.Button
-                                    className="my-4"
-                                    color="primary"
-                                    type="button"
-                                    onClick={handleSaveClick}
-                                    disabled={!isFormValid()}
-                                >
-                                    Registrar
-                                </Reactstrap.Button>
-                            </div>
-                        </Reactstrap.Form>
-                    </Reactstrap.CardBody>
-                </Reactstrap.Card>
-            </div>
-        </Reactstrap.Modal>
-    );
-}
+export default CombinedModal;

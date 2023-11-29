@@ -114,35 +114,13 @@ export default function List() {
     return randomCode.toString(); // Convierte el número en una cadena de texto
   };
 
-  const handleSaveClick = () => {
-    // Genera un código aleatorio
-    const newCode = generateRandomCode();
-
-    // Realiza las operaciones necesarias al hacer clic en "Guardar"
-    setAlertType("success"); // Configura el tipo de alerta
-    setAlertMessage("Operación de registro exitosa"); // Configura el mensaje de la alerta
-
-    // Agregar el nuevo elemento con el código aleatorio y versión 1
-    const newCompetence = {
-      labor_competence_code: newCode,
-      labor_competition: name,
-      labor_competition_version: 1, // Versión inicial en 1
-      // Otros campos de la nueva competencia
-    };
-
-    // Agregar la nueva competencia al principio de la lista
+  const handleSaveClick = (newCompetence) => {
     setCompetences([newCompetence, ...competences]);
-
-    // Guardar los datos en localStorage
     localStorage.setItem("competences", JSON.stringify([newCompetence, ...competences]));
-
-    setShowAlert(true); // Muestra la alerta
-    setModalOpen(false); // Cierra el modal de creación de competencia
-
-    // Reiniciar la página actual a la primera página
+    setShowAlert(true);
+    setModalOpen(false);
     setCurrentPage(1);
   };
-
   const openModal = (op, id, name) => {
     setId(id);
     setName(name);

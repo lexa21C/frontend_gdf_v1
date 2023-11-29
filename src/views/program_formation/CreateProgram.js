@@ -3,7 +3,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input, Label } from
 import Select from "react-select";
 import axios from 'axios';
 
-const CreateProgramModal = ({ isOpen, toggle, handleSaveClick }) => {
+const CreateProgramModal = ({ isOpen, toggle, handleSaveClick, setPrograms, updatePrograms }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [programCode, setProgramCode] = useState("");
   const [duration, setDuration] = useState("");
@@ -50,14 +50,21 @@ const CreateProgramModal = ({ isOpen, toggle, handleSaveClick }) => {
     const isProgramCodeValid = programCode.length >= 6;
     const isDurationValid = duration.length > 0;
     const isProgramLevelValid = programLevel.length > 0;
-    // Agregar validaciones para los nuevos campos si es necesario
+    const isProgramVersionValid = programVersion.length > 0;
+    const areDatesValid = programStartDate && programEndDate && programStartDate <= programEndDate;
 
-    return isProgramCodeValid && isDurationValid && isProgramLevelValid;
+    return (
+      isProgramCodeValid &&
+      isDurationValid &&
+      isProgramLevelValid &&
+      isProgramVersionValid &&
+      areDatesValid
+    );
   };
 
   const handleSave = async () => {
     try {
-      const response = await axios.post('/api/v1/formation_programs', {
+      const newProgram = {
         program_name: selectedOption.label,
         program_code: programCode,
         duration: duration,
@@ -66,12 +73,36 @@ const CreateProgramModal = ({ isOpen, toggle, handleSaveClick }) => {
         Program_version: programVersion,
         program_start_date: programStartDate,
         program_end_date: programEndDate,
-        // Otros datos que necesites enviar al servidor
-      });
+      };
+      
 
-      console.log("Registro exitoso:", response.data);
+      // Actualizar la lista de programas en el estado local de List
+      setPrograms((prevPrograms) => [...prevPrograms, newProgram]);
 
-      handleSaveClick(response.data);
+      // Enviar la solicitud para crear el nuevo programa en el servidor
+      const response = await axios.post('/api/v1/formation_programs', newProgram);
+
+      if (response.status === 201) {
+        // Actualizar la lista de programas en el componente padre
+        updatePrograms(newProgram);
+
+        console.log("Registro exitoso:", newProgram);
+
+        // Limpiar el estado del formulario
+        setSelectedOption(null);
+        setProgramCode("");
+        setDuration("");
+        setProgramLevel("");
+        setTotalDuration("");
+        setProgramVersion("");
+        setProgramStartDate("");
+        setProgramEndDate("");
+      } else {
+        console.error("Error al crear el programa. Estado de respuesta:", response.status);
+      }
+
+      // Cerrar el modal u realizar otras acciones según tus necesidades
+      toggle();
     } catch (error) {
       console.error("Error al guardar el registro:", error);
     }
@@ -115,10 +146,10 @@ const CreateProgramModal = ({ isOpen, toggle, handleSaveClick }) => {
           value={programCode}
           required
         />
-        <Label for="input-duration">Duración</Label>
+        <Label for="input-total_duration">Duración</Label>
         <Input
           type="text"
-          id="input-duration"
+          id="input-total_duration"
           placeholder="Ejemplo: meses-años"
           onChange={handleDurationChange}
           value={duration}
@@ -141,6 +172,7 @@ const CreateProgramModal = ({ isOpen, toggle, handleSaveClick }) => {
           placeholder="Ejemplo: 1.0"
           onChange={handleProgramVersionChange}
           value={programVersion}
+          required
         />
         <Label for="input-programStartDate">Fecha de Inicio del Programa</Label>
         <Input
