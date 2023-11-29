@@ -31,6 +31,7 @@ import FormationPrograms from "views/program_formation/List.js"
 import Artiffacts from "views/Artiffacts/panel_control.js"
 import Users from "views/users/ListUser.js"
 import Category from "views/Categories/CrudCategory.js"
+import  CategoryPage  from "views/Categories/category.js"
 import ErroPage from './components/ErrorPage/AnimationErrorPage.js'
 
 var routes = [
@@ -174,6 +175,15 @@ var routes = [
     name: "Categorias",
     icon: "ni ni-archive-2 text-red",
     element: <Category/>,
+    layout: "/admin",
+    Auth: "true",
+    permission: {p1:"Administrador",p2:"Instructor Lider"}
+  },
+  {
+    path: "/categories1",
+    name: "Categorias1",
+    icon: "ni ni-archive-2 text-red",
+    element: < CategoryPage/>,
     layout: "/admin",
     Auth: "true",
     permission: {p1:"Administrador",p2:"Instructor Lider"}
