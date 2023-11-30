@@ -33,7 +33,7 @@ import Users from "views/users/ListUser.js"
 import Category from "views/Categories/CrudCategory.js"
 import  CategoryPage  from "views/Categories/category.js"
 import ErroPage from './components/ErrorPage/AnimationErrorPage.js'
-
+import { ListRecord } from "views/Records/record.js";
 var routes = [
   {
     path: "/index",
@@ -139,7 +139,7 @@ var routes = [
     sidebar:false,
     permission:  {p1:"Administrador", p2:"Instructor Lider",p3:"Instructor"}
   },
- 
+  
   {
     path: "/learning_results/=/:competenceid/&/:nameCompetence",
     name: "Resultados de aprendizaje",
@@ -175,6 +175,15 @@ var routes = [
     name: "Categorias",
     icon: "ni ni-archive-2 text-red",
     element: <Category/>,
+    layout: "/admin",
+    Auth: "true",
+    permission: {p1:"Administrador",p2:"Instructor Lider"}
+  },
+  {
+    path: "/records",
+    name: "records",
+    icon: "ni ni-archive-2 text-red",
+    element: <ListRecord/>,
     layout: "/admin",
     Auth: "true",
     permission: {p1:"Administrador",p2:"Instructor Lider"}

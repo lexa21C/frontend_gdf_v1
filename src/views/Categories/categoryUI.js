@@ -5,7 +5,11 @@ import { List } from "./list.js"
 import { Item } from "./item.js"
 import { Card } from "./card.js"
 function CategoryUI(){
-    const { categories, getCategories} =  React.useContext(CategoryContext);
+    const { 
+      categories, 
+      getCategories,
+      toggleModal
+    } =  React.useContext(CategoryContext);
 
     useEffect(() => {
         getCategories();
@@ -15,7 +19,7 @@ function CategoryUI(){
     // In your CategoryUI component
 return (
   <>
-    <Card>
+    <Card toggleModal={toggleModal}>
 
       <List>
         {categories && categories.map((category, index) => (

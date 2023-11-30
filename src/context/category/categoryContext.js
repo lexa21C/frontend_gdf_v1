@@ -11,22 +11,31 @@ const CategoryContext = createContext();
 
 function CategoryProvider({ children }) {
   const [categories, setCategories] = useState([]);
+ // modal 
+  const [modal, setModal] = useState(false);
+  const [type, setType] = useState(false)
+
   const getCategories = async () => {
     const res = await getCategoriesRequest();
-    console.log(res.data.results
-        );
-    setCategories(res.data.results
-        );
-    console.log('categorias')
-    console.log(categories)
+    setCategories(res.data.results);
+    
   };
-
+  const toggleModal = () => {
+    console.log('modal')
+    setModal(!modal);
+    setType(false);
+  };
   return (
     <CategoryContext.Provider
       value={{
         setCategories,
         categories,
         getCategories,
+        toggleModal,
+        modal,
+        setModal,
+        type,
+        setType,
       }}
     >
       {children}

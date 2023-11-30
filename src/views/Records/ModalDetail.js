@@ -1,7 +1,7 @@
 import * as Reactstrap from "reactstrap";
 
 const ModalDetalleRegistro = ({ record, toggleShow }) => {
-
+  
   return (
     <Reactstrap.Modal 
     className=" modal-lg modal-dialog-centered "
@@ -39,7 +39,7 @@ const ModalDetalleRegistro = ({ record, toggleShow }) => {
       <Reactstrap.Col md="4">
         <label className="text-primary">Programa de Formación :</label>
         <ul>
-        {record?.formation_program.map((program) => {
+        {record?.formation_program?.map((program) => {
             return <li>{program.program_name}</li>
         })}
        </ul>

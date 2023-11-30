@@ -8,7 +8,7 @@ import PaginationData from "../../components/Pagination/pagination.js";
 import ALertModalCuestion from '../../components/Alert/ALertModalCuestion.js'
 
 
- function Card({ children }) {
+ function Card({ children, toggleModal}) {
   const url = 'api/v1/categories';
 
   const [name, setName] = useState('');
@@ -52,21 +52,11 @@ import ALertModalCuestion from '../../components/Alert/ALertModalCuestion.js'
   };
 
 
-  // const handleDelete = async (categoryId) => {
-  //     const response = await axios.delete(`api/v1/category/${categoryId}`);
-  //     if (response.status === 200) {
-  //       // Categoría eliminada exitosamente
-  //       getCategory(); // Actualizar la lista de categorías
-  //       setAlertCuenstion(true)
-  //   }
-  // };
 
 
 
-    //filtro buscador
-    const filteredCategory = category?.filter(categor =>
-      (categor.name && categor.name.toString().toLowerCase().includes(searchTerm.toLowerCase())) 
-    );
+
+    
   return (
     <>
       <Header title1="Gestionar Categorías" />
@@ -78,7 +68,7 @@ import ALertModalCuestion from '../../components/Alert/ALertModalCuestion.js'
                 <Reactstrap.Button
                   color="primary"
                   className="btn-circle btn-neutral"
-                  onClick={() => openModal(1, '', '')}
+                  onClick={toggleModal}
                   type="button"
                 >
                   <i className="ni ni-fat-add"></i> 
