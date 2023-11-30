@@ -10,7 +10,7 @@ import Loading from "../../components/loader/loader.js";
 import ALertModalCuestion from "../../components/Alert/ALertModalCuestion.js";
 import AlertModal from "../../components/Alert/AlertModal.js";
 import Select from "react-select";
-import Modal from "./CreateResults.js"; // Asegúrate de ajustar la ruta correcta
+import Modal from "./CreateResults.js";
 
 const Butonn = (routeName, data, name) => {
   const matchingRoute = routes.find((route) => route.name === routeName);
@@ -114,13 +114,18 @@ export default function List() {
     return randomCode.toString(); // Convierte el número en una cadena de texto
   };
 
-  const handleSaveClick = (newCompetence) => {
-    setCompetences([newCompetence, ...competences]);
-    localStorage.setItem("competences", JSON.stringify([newCompetence, ...competences]));
-    setShowAlert(true);
-    setModalOpen(false);
-    setCurrentPage(1);
+  const handleSaveClick = async (newCompetence) => {
+    try {
+      setCompetences([newCompetence, ...competences]);
+      localStorage.setItem("competences", JSON.stringify([newCompetence, ...competences]));
+      setShowAlert(true);
+      setModalOpen(false);
+      setCurrentPage(1);
+    } catch (error) {
+      console.error("Error al guardar el registro:", error);
+    }
   };
+  
   const openModal = (op, id, name) => {
     setId(id);
     setName(name);
@@ -234,6 +239,7 @@ export default function List() {
                     )
                     .slice(firstIndex, lastIndex)
                     .map((data, index) => {
+                      console.log(data);
                       return (
                         <tr key={index}>
                           <th>{index + 1}</th>
@@ -280,8 +286,6 @@ export default function List() {
                   />
                 </nav>
               </Reactstrap.CardFooter>
-
-              
             </Reactstrap.Card>
           </div>
         </Reactstrap.Row>
@@ -296,7 +300,12 @@ export default function List() {
           onConfirm={handleDeleteConfirmation} // Llama a la función de eliminación
         />
       )}
-      <Modal isOpen={modalOpen} toggle={toggleModal} competences={competences} />
+      <Modal
+  isOpen={modalOpen}
+  toggle={toggleModal}
+  competences={competences}
+  handleSaveClick={handleSaveClick} // Pasar la función al modal
+/>
     </>
   );
 }

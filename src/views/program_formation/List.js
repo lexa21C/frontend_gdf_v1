@@ -114,6 +114,8 @@ export default function List() {
     }
   };
 
+
+  
   const addProgram = (newProgram) => {
     setProgram((prevPrograms) => [...prevPrograms, newProgram]);
   };
@@ -121,6 +123,7 @@ export default function List() {
   useEffect(() => {
     async function fetchData() {
       const results = await getData(user._id);
+       console.log(results);
       setProgram(results);
       setTimeout(()=>{
         setIsLoading(false)
@@ -178,6 +181,7 @@ export default function List() {
                       .includes(searchTerm.toLowerCase())
                   ).slice(firstIndex, lastIndex)
                     .map((data, index) => {
+                      console.log(data); 
                       return (
                         <tr key={index}>
                           <th>{index + 1}</th>
@@ -189,9 +193,9 @@ export default function List() {
                             </Reactstrap.Media>
                           </th>
                           <td>{data.program_name}</td>
-                          <td>{data.program_version}</td>
-                          <td>{data.total_duration}</td>
-                          <td>{data.program_level.program_level}</td>
+        <td>{data.program_version}</td> {/* Asegúrate de tener esta línea */}
+        <td>{data.total_duration}</td>
+        <td>{data.program_level.program_level}</td> {/* Asegúrate de tener esta línea */}
                           <td>
                             <Reactstrap.UncontrolledDropdown className="mr-2">
                               {Butonn('Fichas', data._id, data.program_name)}

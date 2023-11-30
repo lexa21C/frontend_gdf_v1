@@ -3,12 +3,13 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input, Label } from
 import Select from 'react-select';
 import axios from 'axios';
 
-const CombinedModal = ({ isOpen, toggle, competences, setPrograms, updatePrograms }) => {
+const CombinedModal = ({ isOpen, toggle, competences, handleSaveClick }) => {
   const [selectedOption, setSelectedOption] = useState('');
   const [programCode, setProgramCode] = useState('');
   const [duration, setDuration] = useState('');
   const [trimester, setTrimester] = useState('');
-
+  const [version, setVersion] = useState('');
+  
   const options = competences.map((competence, index) => ({
     value: competence._id,
     label: `${index + 1}.${competence.labor_competition}`,
@@ -30,25 +31,37 @@ const CombinedModal = ({ isOpen, toggle, competences, setPrograms, updateProgram
     setTrimester(e.target.value);
   };
 
+  const handleVersionChange = (e) => {
+    setVersion(e.target.value);
+  };
+
+
+  
   const handleSave = async () => {
     try {
       const newCompetence = {
-        labor_competition: selectedOption.label, // Cambié el campo a 'labor_competition'
-        // Puedes agregar otros campos necesarios para la competencia
+        labor_competition: selectedOption.label,
+        programCode,
+        duration,
+        trimester,
+        version,
       };
-
-      // Enviar la solicitud para crear la nueva competencia en el servidor
+  
       const response = await axios.post('/api/v1/competences', newCompetence);
-
-      if (response.status === 201) {
+  
+      if (response.status === 201 || response.status === 200) {
         console.log("Competencia registrada exitosamente:", newCompetence);
-
+  
+        // Llama a la función handleSaveClick pasada como una propiedad
+        handleSaveClick(newCompetence);
+  
         // Limpiar el estado del formulario
         setSelectedOption('');
         setProgramCode('');
         setDuration('');
         setTrimester('');
-
+        setVersion('');
+  
         // Cerrar el modal
         toggle();
       } else {
@@ -106,6 +119,16 @@ const CombinedModal = ({ isOpen, toggle, competences, setPrograms, updateProgram
           id="input-trimester"
           onChange={handleTrimesterChange}
           value={trimester}
+          required
+        />
+
+        <Label for="input-version">Versión</Label>
+        <Input
+          type="text"
+          placeholder="Ejemplo: 1.0"
+          id="input-version"
+          onChange={handleVersionChange}
+          value={version}
           required
         />
       </ModalBody>
