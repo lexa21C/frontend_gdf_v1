@@ -116,8 +116,25 @@ export default function List() {
 
 
   
-  const addProgram = (newProgram) => {
-    setProgram((prevPrograms) => [...prevPrograms, newProgram]);
+  const addProgram = async (newProgram) => {
+    try {
+      // Envía una solicitud POST a tu API backend
+      const respuesta = await axios.post('api/v1/formation_programs', newProgram);
+      
+      // Verifica si la solicitud fue exitosa
+      if (respuesta.status === 200) {
+        // Si es exitoso, actualiza el estado con el nuevo programa
+        setPrograms((prevPrograms) => [...prevPrograms, respuesta.data]);
+        
+        // Opcionalmente, cierra el modal
+        toggle();
+      } else {
+        // Maneja casos de error si es necesario
+        console.error('Error al agregar el programa:', respuesta.data);
+      }
+    } catch (error) {
+      console.error('Error al agregar el programa:', error);
+    }
   };
 
   useEffect(() => {
