@@ -39,7 +39,8 @@ const ModalDetalleRegistro = ({ record, toggleShow }) => {
       <Reactstrap.Col md="4">
         <label className="text-primary">Programa de Formación :</label>
         <ul>
-        {record?.formation_program?.map((program) => {
+        {record?.formation_program && Array.isArray(record.formation_program) &&
+  record.formation_program.map((program)=> {
             return <li>{program.program_name}</li>
         })}
        </ul>
@@ -51,7 +52,8 @@ const ModalDetalleRegistro = ({ record, toggleShow }) => {
         <label className="text-primary" style={{marginLeft: '23em'}}>Datos del Instructor :</label>
        
         <ul>
-        {record?.user?.map((users) => {
+        {record?.user && Array.isArray(record.user) &&
+  record.user.map((users) => {
             return <li>
               <span style={{fontSize:'15px', marginLeft:'12em'}} className="text-primary">Nombre: </span>{users.complete_names} 
             

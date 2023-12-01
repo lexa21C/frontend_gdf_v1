@@ -1,5 +1,5 @@
 // recordsContext.js
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback} from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
@@ -22,42 +22,54 @@ const RecordsProvider = ({ children }) => {
   const [showAlertCuestion, setAlertCuenstion] = useState(false);
   const [apiDeleteRecord, setapiDeleteRecord] = useState('');
 
-  const fetchData = async () => {
-    const { data } = await axios.get(`api/v1/records`);
-    setRecords(data.results);
-  };
+  const fetchData = useCallback(async () => {
+    try {
+      const { data } = await axios.get(`api/v1/records`);
+      setRecords(data.results);
+    } catch (error) {
+      // Manejar el error adecuadamente
+      console.error('Error fetching data:', error);
+    }
+  }, [setRecords]);
+  
 
   useEffect(() => {
     fetchData();
     const storedTypeProfile = localStorage.getItem('User');
     const json = JSON.parse(storedTypeProfile)
     setTypeProfile(json.type_profile.map((e) => e.type_profile));
-  }, [modal, showAlertCuestion, program_id]);
+  }, [fetchData, modal, showAlertCuestion, program_id]);
+
 
   const toggle = () => {
     setModal(!modal);
     setType(false);
   };
 
-  const Edit = (record) => {
+  const Edit = useCallback((record) => {
     setSelectedRecord(record);
     setModal(true);
     setType(true);
-  };
+  }, [setSelectedRecord, setModal, setType]);
 
-  const destroy = (id) => {
-    setapiDeleteRecord(`api/v1/records/${id}`)
-    setAlertCuenstion(true);
-  };
-
-  const handleCloseAlert = () => {
+  const destroy = useCallback(async (id) => {
+    try {
+      await setapiDeleteRecord(`api/v1/records/${id}`);
+      setAlertCuenstion(true);
+    } catch (error) {
+      console.error('Error en setapiDeleteRecord:', error);
+      // Puedes manejar el error de manera adecuada, por ejemplo, mostrando un mensaje al usuario
+    }
+  }, [setapiDeleteRecord, setAlertCuenstion]);
+  
+  const handleCloseAlert = useCallback(() => {
     setAlertCuenstion(false);
-  };
-
-  const seeDetail = (record) => {
-    console.log('detalle:', record)
+  }, [setAlertCuenstion]);
+  
+  const seeDetail = useCallback((record) => {
+    console.log('detalle:', record);
     setRegistroSeleccionado(record);
-  };
+  },[setRegistroSeleccionado]);
 
   const toggleShow = () => {
 
@@ -69,10 +81,12 @@ const RecordsProvider = ({ children }) => {
     setSearchTerm(event.target.value);
   };
 
+ 
   const filteredRecords = records?.filter((record) =>
-    (record.number_record && record.number_record.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (record.user && record.user.some(user => user.complete_names.toLowerCase().includes(searchTerm.toLowerCase())))
-  );
+  (record.number_record && record.number_record.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||
+  (record.user && record.user.some(user => user.complete_names && user.complete_names.toLowerCase().includes(searchTerm.toLowerCase())))
+);
+
 
   const lastIndex = PerPage * currentPage;
   const firstIndex = lastIndex - PerPage;
