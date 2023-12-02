@@ -6,18 +6,29 @@ import axios from 'axios';
 const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [programCode, setProgramCode] = useState("");
+  const [programName, setProgramName] = useState("");
   const [programLevel, setProgramLevel] = useState("");
   const [totalDuration, setTotalDuration] = useState("");
   const [programVersion, setProgramVersion] = useState("");
-  const [programStartDate, setProgramStartDate] = useState("");
-  const [programEndDate, setProgramEndDate] = useState("");
+  const [programStartDate, setProgramStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [programEndDate, setProgramEndDate] = useState(new Date().toISOString().split('T')[0]);
   const [programData, setProgramData] = useState([]);
   const [thematicLine, setThematicLine] = useState("");
   const [dateError, setDateError] = useState(false);
   const [codeError, setCodeError] = useState(false);
 
+  // Define the formatDate function
+  const formatDate = (date) => {
+    const formattedDate = new Date(date);
+    return formattedDate.toISOString().split('T')[0];
+  };
+
   const handleSelectChange = (selectedOption) => {
     setSelectedOption(selectedOption);
+  };
+
+  const handleProgramNameChange = (e) => {
+    setProgramName(e.target.value);
   };
 
   const handleProgramCodeChange = (e) => {
@@ -38,15 +49,17 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
   };
 
   const handleProgramStartDateChange = (e) => {
-    setProgramStartDate(e.target.value);
+    const startDate = e.target.value;
+    setProgramStartDate(startDate);
     if (programEndDate) {
-      setDateError(e.target.value > programEndDate);
+      setDateError(startDate > programEndDate);
     }
   };
 
   const handleProgramEndDateChange = (e) => {
-    setProgramEndDate(e.target.value);
-    setDateError(programStartDate > e.target.value);
+    const endDate = e.target.value;
+    setProgramEndDate(endDate);
+    setDateError(programStartDate > endDate);
   };
 
   const handleThematicLineChange = (e) => {
@@ -55,6 +68,7 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
 
   const isFormValid = () => {
     return (
+      programName &&
       programCode.length >= 6 &&
       totalDuration.length > 0 &&
       programVersion.length > 0 &&
@@ -75,41 +89,41 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
         console.error('Formulario no válido');
         return;
       }
-  
+
       const selectedProgram = programData.find((program) => program._id === selectedOption.value);
-  
+
       const newProgram = {
-        program_name: selectedOption.label,
+        program_name: programName,
         program_code: programCode,
         total_duration: totalDuration,
         Program_version: programVersion,
-        program_start_date: programStartDate,
-        program_end_date: programEndDate,
+        thematic_line: selectedOption.label,
+        program_start_date: formatDate(programStartDate),
+        program_end_date: formatDate(programEndDate),
         competence: selectedProgram.competence || [],
         program_level: programLevel || "",
-        thematic_line: thematicLine || "",
       };
-  
+
       // Guarda el nuevo programa
       const response = await axios.post('/api/v1/formation_programs', newProgram);
-  
+
       console.log('Programa guardado correctamente:', response.data);
-  
+
       // Verifica si updatePrograms es una función antes de llamarla
       if (typeof updatePrograms === 'function') {
         updatePrograms();
       }
-  
+
       setSelectedOption(null);
       setProgramCode("");
       setTotalDuration("");
       setProgramVersion("");
-      setProgramStartDate("");
-      setProgramEndDate("");
+      setProgramStartDate(new Date().toISOString().split('T')[0]);
+      setProgramEndDate(new Date().toISOString().split('T')[0]);
       setThematicLine("");
       setCodeError(false);
       setDateError(false);
-  
+
       toggle();
     } catch (error) {
       console.error("Error al guardar el registro:", error);
@@ -138,13 +152,13 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
     <Modal isOpen={isOpen} toggle={toggle} centered>
       <ModalHeader toggle={toggle}>Registrar Programa</ModalHeader>
       <ModalBody>
-      <Label htmlFor="input-thematicLine">Programa</Label>
+        <Label htmlFor="input-programName">Programa</Label>
         <Input
           type="text"
-          id="input-thematicLine"
+          id="input-programName"
           placeholder="Ejemplo: OPERACIÓN DE EQUIPOS "
-          onChange={handleThematicLineChange}
-          value={thematicLine}
+          onChange={handleProgramNameChange}
+          value={programName}
         />
         <Label htmlFor="input-programCode">Código del Programa (más de 6 dígitos)</Label>
         <Input
@@ -176,7 +190,7 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
         />
         <Label htmlFor="input-programVersion">Versión del Programa</Label>
         <Input
-          type="text"
+          type="number"
           id="input-programVersion"
           placeholder="Ejemplo: 1.0"
           onChange={handleProgramVersionChange}
@@ -185,11 +199,11 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
         />
         <Label htmlFor="select-tematica">Línea Temática</Label>
         <Select
-  id="select-tematica"
-  options={options}
-  value={selectedOption}
-  onChange={handleSelectChange}
-/>
+          id="select-tematica"
+          options={options}
+          value={selectedOption}
+          onChange={handleSelectChange}
+        />
         <Label htmlFor="input-programStartDate">Fecha de Inicio del Programa</Label>
         <Input
           type="date"
