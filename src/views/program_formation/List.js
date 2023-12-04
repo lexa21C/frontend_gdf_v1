@@ -101,13 +101,13 @@ export default function List() {
   const lastIndex = PerPage * currentPage;
   const firstIndex = lastIndex - PerPage;
 
-  const user =JSON.parse(localStorage.getItem("User"));
+  const user = JSON.parse(localStorage.getItem("User"));
 
   const handleInputChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-    const toggle = (callback) => {
+  const toggle = (callback) => {
     setModalOpen(!modalOpen);
     if (callback && typeof callback === 'function') {
       callback(); // Llamar al callback después de cerrar el modal
@@ -115,17 +115,17 @@ export default function List() {
   };
 
 
-  
+
   const addProgram = async (newProgram) => {
     try {
       // Envía una solicitud POST a tu API backend
       const respuesta = await axios.post('api/v1/formation_programs', newProgram);
-      
+
       // Verifica si la solicitud fue exitosa
       if (respuesta.status === 200) {
         // Si es exitoso, actualiza el estado con el nuevo programa
         setPrograms((prevPrograms) => [...prevPrograms, respuesta.data]);
-        
+
         // Opcionalmente, cierra el modal
         toggle();
       } else {
@@ -140,25 +140,25 @@ export default function List() {
   useEffect(() => {
     async function fetchData() {
       const results = await getData(user._id);
-       console.log(results);
+      console.log(results);
       setProgram(results);
-      setTimeout(()=>{
+      setTimeout(() => {
         setIsLoading(false)
-      },500)
+      }, 500)
     }
     fetchData();
   }, [searchTerm]);
 
   return (
     <>
-         {isLoading && <Loading  />}
+      {isLoading && <Loading />}
       <Head title1="Programa Formacion" />
       <Reactstrap.Container className="mt--7" fluid>
         <Reactstrap.Row>
           <div className="col">
             <Reactstrap.Card className="shadow">
               <Reactstrap.CardHeader className="border-0">
-              <Reactstrap.Button
+                <Reactstrap.Button
                   color="primary"
                   type="button"
                   className="btn-circle btn-neutral "
@@ -198,7 +198,7 @@ export default function List() {
                       .includes(searchTerm.toLowerCase())
                   ).slice(firstIndex, lastIndex)
                     .map((data, index) => {
-                      console.log(data); 
+                      console.log(data);
                       return (
                         <tr key={index}>
                           <th>{index + 1}</th>
@@ -210,9 +210,9 @@ export default function List() {
                             </Reactstrap.Media>
                           </th>
                           <td>{data.program_name}</td>
-        <td>{data.program_version}</td> {/* Asegúrate de tener esta línea */}
-        <td>{data.total_duration}</td>
-        <td>{data.program_level.program_level}</td> {/* Asegúrate de tener esta línea */}
+                          <td>{data.program_version}</td> {/* Asegúrate de tener esta línea */}
+                          <td>{data.total_duration}</td>
+                          <td>{data.program_level.program_level}</td> {/* Asegúrate de tener esta línea */}
                           <td>
                             <Reactstrap.UncontrolledDropdown className="mr-2">
                               {Butonn('Fichas', data._id, data.program_name)}
@@ -240,10 +240,10 @@ export default function List() {
                 </nav>
               </Reactstrap.CardFooter>
               <CreateProgramModal
-        isOpen={modalOpen}
-        toggle={() => setModalOpen(!modalOpen)}
-        setPrograms={setProgram} 
-      />
+                isOpen={modalOpen}
+                toggle={() => setModalOpen(!modalOpen)}
+                setPrograms={setProgram}
+              />
             </Reactstrap.Card>
           </div>
         </Reactstrap.Row>

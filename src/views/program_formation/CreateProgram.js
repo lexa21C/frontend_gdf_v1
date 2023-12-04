@@ -13,6 +13,7 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
   const [programStartDate, setProgramStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [programEndDate, setProgramEndDate] = useState(new Date().toISOString().split('T')[0]);
   const [programData, setProgramData] = useState([]);
+  const [thematicLinesOptions, setThematicLinesOptions] = useState([]);
   const [thematicLine, setThematicLine] = useState("");
   const [dateError, setDateError] = useState(false);
   const [codeError, setCodeError] = useState(false);
@@ -90,7 +91,6 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
         return;
       }
 
-      const selectedProgram = programData.find((program) => program._id === selectedOption.value);
 
       const newProgram = {
         program_name: programName,
@@ -100,7 +100,6 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
         thematic_line: selectedOption.label,
         program_start_date: formatDate(programStartDate),
         program_end_date: formatDate(programEndDate),
-        competence: selectedProgram.competence || [],
         program_level: programLevel || "",
       };
 
@@ -130,23 +129,31 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
     }
   };
 
+
   useEffect(() => {
-    const fetchProgramData = async () => {
+    const fetchThematicLines = async () => {
       try {
-        const response = await axios.get('/api/v1/formation_programs');
-        setProgramData(response.data.results);
+        const response = await axios.get('/api/v1/thematics');
+        const thematicLines = response.data.results.map((thematic) => ({
+          value: thematic._id,
+          label: thematic.thematic_line,
+        }));
+        setThematicLinesOptions(thematicLines);
       } catch (error) {
-        console.error("Error fetching program data:", error);
+        console.error('Error fetching thematic lines:', error);
       }
     };
 
-    fetchProgramData();
+    fetchThematicLines();
   }, []);
 
-  const options = programData.map((program) => ({
-    value: program._id,
-    label: program.thematic_line,
-  }));
+  const options = thematicLinesOptions.concat(
+    programData.map((program) => ({
+      value: program._id,
+      label: program.thematic_line,
+    }))
+  );
+ 
 
   return (
     <Modal isOpen={isOpen} toggle={toggle} centered>
