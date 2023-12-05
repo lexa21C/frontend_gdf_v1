@@ -3,8 +3,9 @@ import Header from "../../components/Headers/HEAD";
 import axios from "axios";
 import PaginationData from "../../components/Pagination/pagination.js";
 import { useState, useEffect } from "react";
-import Search from "../../components/Search/search";
 import Modal from "./modal.js";
+
+import Search from "../../components/Search/search";
 import { NavLink as NavLinkRRD } from "react-router-dom";
 import { NavLink } from 'react-router-dom';
 import routes from "../../routes.js";
@@ -73,6 +74,7 @@ const Butonn = (routeName, data, name) => {
 
 export default function List() {
   const [records, setRecords] = useState([]);
+
   const [modal, setModal] = useState(false);
   const [type, setType] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -111,8 +113,7 @@ export default function List() {
 
   const lastIndex = PerPage * currentPage;
   const firstIndex = lastIndex - PerPage;
-
-
+ //delete
   const [showAlertCuestion, setAlertCuenstion] = useState(false);
 
   const [apiDeleteRecord, setapiDeleteRecord] = useState('');

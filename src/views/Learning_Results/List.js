@@ -3,63 +3,40 @@ import * as Reactstrap from "reactstrap";
 import Header from "../../components/Headers/HEAD";
 import axios from "axios";
 import PaginationData from "../../components/Pagination/pagination.js";
-import ModalResults from "../Learning_Results/CreateResult.js"
 import { useState, useEffect } from "react";
+import ModalResults from "../Learning_Results/CreateResult.js"
+import ALertModalCuestion from '../../components/Alert/ALertModalCuestion.js'
+import ModalDetail from '../Learning_Results/ModalDetail.js'
 import { useParams } from 'react-router-dom';
 import Search from "../../components/Search/search"
+import{useLearningResultContext, LearningResultProvider} from '../../context/learningResult/learningRresultContext.js';
 
-export default function List() {
-
-  const [results, setResults] = useState([]);
-  //bucador
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const [modal, setModal] = useState(false);
-
-  const [type, setType] = useState(false)
-
-  //select para editar 
-  const [selectedResult, setSelectedResult] = useState(null);
-
-  const { competenceid } = useParams();
-  const { nameCompetence } = useParams();
-
-  const toggle = () => {
-    setModal(!modal);
-    setType(false);
-  };
-
-  //Editar
-  const Edit = (learning_r) => {
-    setSelectedResult(learning_r);
-    setModal(true);
-    setType(true);
-  };
-
-  // pagination data
-  const totalResults = results?.length;
-  const [PerPage] = useState(9);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const lastIndex = PerPage * currentPage;
-  const firstIndex = lastIndex - PerPage;
-
-  const handleInputChange = event => {
-    setSearchTerm(event.target.value);
-  };
-
-  useEffect(() => {
-  //  getData();
-  const fetchData = async () => {
-    const { data } = await axios.get(
-      `api/v1/learningResults/${competenceid}`
-    );
-    setResults(data.results);
-  };
-  fetchData();
-  }, [modal, searchTerm, competenceid]
-  );
-
+ function List() {
+    const {
+      results,
+      searchTerm,
+      handleInputChange,
+      PerPage,
+      currentPage,
+      setCurrentPage,
+      selectedResult,
+      modal,
+      type,
+      showAlertCuestion,
+      apiDeleteLearningResult,
+      toggle,
+      Edit,
+      destroy,
+      handleCloseAlert,
+      seeDetail,
+      toggleShow,
+      totalResults,
+      nameCompetence,
+      firstIndex,
+      lastIndex,
+      registroSeleccionado,
+      setRegistroSeleccionado
+    } = useLearningResultContext();
   return (
     <>
       <Header title='Competencias: ' description={`${nameCompetence}`} />
@@ -116,7 +93,15 @@ export default function List() {
                           </div>
                         </th>
                         <td>
-                
+                        <Reactstrap.Button
+                              color="primary"
+                              type="button"
+                              className="btn-neutral  btn-sm"
+                              onClick={() => seeDetail(learning_result)}
+                            >
+                              <i className="fa-solid fa-eye"></i>
+
+                            </Reactstrap.Button>
                           <Reactstrap.Button
                             color="primary"
                             type="button"
@@ -132,6 +117,21 @@ export default function List() {
                           >
                             Editar 
                           </Reactstrap.UncontrolledTooltip>
+                          <Reactstrap.Button
+                                  color="primary"
+                                  type="button"
+                                  className="btn-neutral  btn-sm"
+                                  onClick={() => destroy(learning_result._id)}
+                                  id={`icon2${learning_result._id}`}
+                                >
+                                  <i className="fa-solid fa-trash-can"></i>
+                                </Reactstrap.Button>
+                                <Reactstrap.UncontrolledTooltip
+                                  delay={0}
+                                  target={`icon2${learning_result._id}`}
+                                >
+                                  Eliminar
+                                </Reactstrap.UncontrolledTooltip>
                         </td>
                       </tr>
 
@@ -149,7 +149,11 @@ export default function List() {
                   />
                 </nav>
               </Reactstrap.CardFooter>
-
+              {/* modal detalle  */}
+              <ModalDetail 
+                learningResult={registroSeleccionado}
+                toggleShow={() => setRegistroSeleccionado(null)}
+              />
               {/* Modal crear */}
               <ModalResults
                 isOpen={modal}
@@ -163,6 +167,11 @@ export default function List() {
           </div>
         </Reactstrap.Row>
       </Reactstrap.Container>
+      {showAlertCuestion && (
+        <ALertModalCuestion api={apiDeleteLearningResult} onClose={handleCloseAlert} />
+      )}
     </>
   )
 }
+
+export {List}

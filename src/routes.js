@@ -25,7 +25,7 @@ import Icons from "views/examples/Icons.js";
 import Competences from "views/Competences/competence.js";
 import Projects from "views/Projects/List.js";
 import PublicProjects from "views/Projects/PublicProjects/ListProjects.js";
-import LearningResults from "views/Learning_Results/List.js";
+import LearningResults from "views/Learning_Results/learningResult.js";
 import Records from "views/Records/List.js";
 import FormationPrograms from "views/program_formation/List.js"
 import Artiffacts from "views/Artiffacts/panel_control.js"
