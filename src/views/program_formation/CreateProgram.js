@@ -14,7 +14,9 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
   const [programEndDate, setProgramEndDate] = useState(new Date().toISOString().split('T')[0]);
   const [programData, setProgramData] = useState([]);
   const [thematicLinesOptions, setThematicLinesOptions] = useState([]);
+  const [LevelOptions,setLevelOptions] = useState([]);
   const [thematicLine, setThematicLine] = useState("");
+  const [Level, setLevel] = useState("");
   const [dateError, setDateError] = useState(false);
   const [codeError, setCodeError] = useState(false);
 
@@ -25,6 +27,10 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
   };
 
   const handleSelectChange = (selectedOption) => {
+    setSelectedOption(selectedOption);
+  };
+
+  const handleSelectChangel = (selectedOption) => {
     setSelectedOption(selectedOption);
   };
 
@@ -67,12 +73,18 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
     setThematicLine(e.target.value);
   };
 
+  const handleLevelChange = (e) => {
+    setLevel(e.target.value);
+  };
+
   const isFormValid = () => {
     return (
       programName &&
       programCode.length >= 6 &&
       totalDuration.length > 0 &&
       programVersion.length > 0 &&
+      selectedOption &&
+      selectedOption.value &&
       programStartDate &&
       programEndDate &&
       programStartDate <= programEndDate &&
@@ -96,11 +108,12 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
         program_name: programName,
         program_code: programCode,
         total_duration: totalDuration,
+        program_level: selectedOption.label,
         Program_version: programVersion,
         thematic_line: selectedOption.label,
         program_start_date: formatDate(programStartDate),
         program_end_date: formatDate(programEndDate),
-        program_level: programLevel || "",
+      
       }
 
       // Guarda el nuevo programa
@@ -113,6 +126,7 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
         updatePrograms();
       }
 
+      setSelectedOption(null);
       setSelectedOption(null);
       setProgramCode("");
       setTotalDuration("");
@@ -144,6 +158,20 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
       }
     };
 
+    const fetchLevel = async () => {
+      try {
+        const response = await axios.get('/api/v1/programlevels');
+        const programLevels = response.data.results.map((programlevels) => ({
+          value: programlevels._id,
+          label: programlevels.Programs_level,
+        }));
+        setThematicLinesOptions(programLevels);
+      } catch (error) {
+        console.error('Error fetching thematic lines:', error);
+      }
+    };
+
+    fetchLevel();
     fetchThematicLines();
   }, []);
 
@@ -153,7 +181,15 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
       label: program.thematic_line,
     }))
   );
- 
+
+  const optionsl = LevelOptions.concat(
+    programData.map((program) => ({
+      value: program._id,
+      label: program.Programs_level,
+    }))
+  );
+
+
 
   return (
     <Modal isOpen={isOpen} toggle={toggle} centered>
@@ -177,14 +213,12 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
           required
         />
         {codeError && <p className="text-danger">El código debe tener al menos 6 dígitos.</p>}
-        <Label htmlFor="input-programLevel">Nivel de Programa</Label>
-        <Input
-          type="text"
-          id="input-programLevel"
-          placeholder="Ejemplo: Tecnologo"
-          onChange={handleProgramLevelChange}
-          value={programLevel}
-          required
+        <Label htmlFor="select-tematica">Nivel de Programa</Label>
+        <Select
+          id="select-tematica"
+          options={optionsl}
+          value={selectedOption}
+          onChange={handleSelectChange}
         />
         <Label htmlFor="input-totalDuration">Duración Total</Label>
         <Input
