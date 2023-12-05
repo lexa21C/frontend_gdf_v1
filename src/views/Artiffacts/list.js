@@ -4,13 +4,13 @@ import { Input } from 'reactstrap';
 import axios from 'axios';
 import {confirmed_alert} from '../../components/Alerts/Alert'
 
-
+//get Artiffacts
 async function getData(learningResult) {
     const { data } = await axios.get(`http://localhost:3500/api/v1/artiffacts/${learningResult}`);
     return data.results;
 }
 
-
+// modal para eliminar el Artiffacts
 function LisModal(props) {
     const [isShow, invokeModal] = useState(false);
     const [artifacts, setArtifacts] = useState([]);

@@ -57,63 +57,39 @@ const ModalResults = ({ isOpen, toggle, type, apiGetC }) => {
   const handleCloseAlert = () => {
     setShowAlert(false);
   };
-
-  const handleSubmit = (e) => {
+  const handleApiError = (err) => {
+    setAlertType(err?.response?.data?.status || 'error');
+    setAlertMessage(err?.response?.data?.message || 'An error occurred');
+    setShowAlert(true);
+  };
+  const handleApiResponse = (res) => {
+    if (res.status === 'success') {
+      toggle(!toggle);
+    }
+    setAlertType(res.status);
+    setAlertMessage(res.message);
+    setShowAlert(true);
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    //validación del formulario
+  
     if (!isValidForm) {
-      // Si hay algún error de validación, no envíes el formulario
       return;
     }
-
-    if (type === false) {
-      
-      
-      axios.post('api/v1/learningResults', data).then(
-        (res) => {
-          if (res.data.status === 'success') {
-
-            toggle(!toggle);
-
-            setData({
-              _id: "",
-              learning_result: "",
-              competence: competenceid
-            })
-          }
-          setAlertType(res.data.status);
-          setAlertMessage(res.data.message);
-          setShowAlert(true);
-
-        }
-
-      ).catch((err) => {
-        setAlertType(err.status);
-        setAlertMessage(err.message);
-        setShowAlert(true);
-      });
-    } else {
-     
-      const { data: res } = axios.put(`api/v1/learningResults/${data._id}`, data).then((res)=>{
-        console.log(res.data.status)
-        if (res.data.status === 'success') {
-
-          toggle(!toggle);
-        }
-        setAlertType(res.data?.status);
-        setAlertMessage(res.data?.message);
-        setShowAlert(true);
-        console.log(res.data?.message)
-      }).catch((err)=>{
-        setAlertType(err.status);
-        setAlertMessage(err.message);
-        setShowAlert(true);
-      });
-
+  
+    try {
+      if (type === false) {
+        const { data: res } = await axios.post('api/v1/learningResults', data);
+        handleApiResponse(res);
+      } else {
+        const { data: res } = await axios.put(`api/v1/learningResults/${data._id}`, data);
+        handleApiResponse(res);
+      }
+    } catch (err) {
+      handleApiError(err);
     }
-
   };
+  
 
   return (
     <>

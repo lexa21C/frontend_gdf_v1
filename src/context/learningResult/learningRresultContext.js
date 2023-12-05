@@ -1,11 +1,10 @@
 // learningContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import ALertModalCuestion from '../../components/Alert/ALertModalCuestion.js';
-import ModalDetail from '../../views/Learning_Results/ModalDetail.js';
-import PaginationData from '../../components/Pagination/pagination.js';
-import ModalResults from '../../views/Learning_Results/CreateResult.js';
-import Search from '../../components/Search/search';
+import {
+  getLearningResults
+} from '../../services/learningResult/learningResultService.js'
+
 import { useParams } from 'react-router-dom';
 const LearningContext = createContext();
 
@@ -13,7 +12,14 @@ const useLearningResultContext = () => {
   return useContext(LearningContext);
 };
 const LearningResultProvider = ({ children }) => {
-  const [typeProfile, setTypeProfile] = useState(null);
+  const getTypeProfileFromLocalStorage = () => {
+    const storedTypeProfile = localStorage.getItem('User');
+    const json = storedTypeProfile ? JSON.parse(storedTypeProfile) : null;
+    return json?.type_profile.map((e) => e.type_profile) || null;
+  };
+  
+  const [typeProfile, setTypeProfile] = useState(() => getTypeProfileFromLocalStorage());
+  
   const [results, setResults] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [modal, setModal] = useState(false);
@@ -46,7 +52,6 @@ const LearningResultProvider = ({ children }) => {
   };
 
   const destroy = (id) => {
-    console.log('id:', id)
     setapiDeleteLearningResult(`api/v1/learningResults/${id}`);
     setAlertCuenstion(true);
   };
@@ -66,16 +71,17 @@ const LearningResultProvider = ({ children }) => {
 
   const totalResults = results?.length;
 
+  const fetchData = async () => {
+    try {
+      const results = await getLearningResults(competenceid);
+      setResults(results);
+    } catch (error) {
+      console.log(error);
+      // Manejar el error aquí si es necesario
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const { data } = await axios.get(`api/v1/learningResults/${competenceid}`);
-      setResults(data.results);
-    };
-    fetchData();
-    const storedTypeProfile = localStorage.getItem('User');
-    const json = JSON.parse(storedTypeProfile);
-    setTypeProfile(json.type_profile.map((e) => e.type_profile));
-    
+    fetchData();  
   }, [modal, showAlertCuestion, searchTerm, competenceid]);
 
   return (
