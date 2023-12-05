@@ -34,6 +34,7 @@ import Category from "views/Categories/CrudCategory.js"
 import  CategoryPage  from "views/Categories/category.js"
 import ErroPage from './components/ErrorPage/AnimationErrorPage.js'
 import { ListRecord } from "views/Records/record.js";
+
 var routes = [
   {
     path: "/index",
@@ -169,7 +170,6 @@ var routes = [
     Auth: "true",
     permission:  {p1:"Administrador",p2:"Instructor Lider", p3:"Instructor" }
   },
-
   {
     path: "/categories",
     name: "Categorias",

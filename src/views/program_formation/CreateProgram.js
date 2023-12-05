@@ -101,7 +101,7 @@ const CreateProgramModal = ({ isOpen, toggle, updatePrograms }) => {
         program_start_date: formatDate(programStartDate),
         program_end_date: formatDate(programEndDate),
         program_level: programLevel || "",
-      };
+      }
 
       // Guarda el nuevo programa
       const response = await axios.post('/api/v1/formation_programs', newProgram);
