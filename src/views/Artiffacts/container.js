@@ -13,18 +13,18 @@ import AlertModal from '../../components/Alert/ALertModalCuestion.js';
 import Header from "components/Headers/HEAD.js";
 
 
-const Container = ({children}) => {
+const Container = ({ leftContent, rightContent }) => {
 
     return (
       <>
         <Reactstrap.Container className="mt--7" fluid>
           <Reactstrap.Row>
             <Reactstrap.Col className="mb-5 mb-xl-0" xl="8">
-                {children}
+            {leftContent}
             </Reactstrap.Col>
 
             <Reactstrap.Col xl="4">
-                {children}
+                {rightContent}
             </Reactstrap.Col>
           </Reactstrap.Row>
         </Reactstrap.Container>
@@ -32,4 +32,4 @@ const Container = ({children}) => {
     );
 };
 
-export default Container;
+export {Container};

@@ -28,7 +28,7 @@ import PublicProjects from "views/Projects/PublicProjects/ListProjects.js";
 import LearningResults from "views/Learning_Results/learningResult.js";
 import Records from "views/Records/List.js";
 import FormationPrograms from "views/program_formation/List.js"
-import Artiffacts from "views/Artiffacts/panel_control.js"
+import Artiffacts from "views/Artiffacts/index.js"
 import Users from "views/users/ListUser.js"
 import Category from "views/Categories/CrudCategory.js"
 import  CategoryPage  from "views/Categories/category.js"

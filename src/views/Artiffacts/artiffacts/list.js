@@ -20,4 +20,4 @@ const List = ({children}) => {
     );
 };
 
-export default List;
+export  {List};

@@ -116,6 +116,11 @@ const ArtiffactsProvider = ({ children }) => {
     Edit2,
     deletes,
     deletes1,
+    setQuarter,
+    deletes,
+    toggle3,
+    setDeleteItemId,
+    setShowAlert
   };
 
   return (

@@ -3,7 +3,7 @@ import * as Reactstrap from "reactstrap";
 import { useParams } from 'react-router-dom';
 import axios from "axios";
 
-import Modal from "./modal.js"
+import Modal from "../modal1.js"
 import ModalQuarter from "./modalQuarter";
 
 import { NavLink as NavLinkRRD } from "react-router-dom";

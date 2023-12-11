@@ -1,48 +1,29 @@
 import { useState, useEffect } from "react";
-
-import Modal from "./modal.js";
+import Modal from "./modal.js"
 import ModalQuarter from "./modalQuarter";
 
 import AlertModal from "../../components/Alert/ALertModalCuestion.js";
-import Header from "components/Headers/HEAD.js";
+import Header from "../../components/Headers/HEAD.js";
+import { useArtiffactsContext} from '../../context/artiffacts/artiffactsContext.js'
+const ModalOpen = () => {
+  const {
+    artiffacts,
+    artiffactOne,
+    modal,
+    type,
+    quarter,
+    typeQuarter,
+    modalQuarter,
+    showAlert,  
+    deleteItemId,
+    deleteApi,
+    competence,
+    toggle,
+    toggle2,
+    setDeleteItemId,
+    setShowAlert,deletes
 
-const Index = () => {
-  let [artiffacts, setArtiffacts] = useState([]);
-
-  const [artiffactOne, setArtiffactOne] = useState([]);
-  const [data, setData] = useState([]);
-
-  const [modal, setModal] = useState(false);
-  const [type, setType] = useState(false);
-
-  const [quarter, setQuarter] = useState([]);
-  const [typeQuarter, setTypeQuarter] = useState(false);
-  const [modalQuarter, setModalQuarter] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-
-  const [deleteItemId, setDeleteItemId] = useState(null);
-  const [deleteApi, setDeleteApi] = useState(null);
-  const competence = data?.map((e) => {
-    return e.competences;
-  });
-
-  const toggle = () => {
-    setModal(!modal);
-    setType(false);
-  };
-
-  const toggle2 = () => {
-    setModalQuarter(!modalQuarter);
-    setTypeQuarter(false);
-  };
-
-  const deletes = async (id) => {
-    // Configura showAlert a true para mostrar la alerta
-    setShowAlert(true);
-    setDeleteItemId(id);
-    setDeleteApi("quarter");
-  };
-
+  } =  useArtiffactsContext()
   return (
     <>
       <Modal
@@ -80,4 +61,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export { ModalOpen};

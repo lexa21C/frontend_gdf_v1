@@ -1,39 +1,18 @@
 import { useState, useEffect } from "react";
 import * as Reactstrap from "reactstrap";
+import { useArtiffactsContext} from '../../../context/artiffacts/artiffactsContext.js'
 
-
-const Index = () => {
+const Item = () => {
    
-    const [mostrarBoton, setMostrarBoton] = useState(false);
+  const {
+    
+    data,
+    setQuarter,
+    deletes,
+    toggle3,
+    Edit
 
-    const [data, setData] = useState([]);
-
-    const [quarter, setQuarter] = useState([]);
-    const [typeQuarter, setTypeQuarter] = useState(false);
-    const [modalQuarter, setModalQuarter] = useState(false);
-    const [showAlert, setShowAlert] = useState(false);
-
-    const [deleteItemId, setDeleteItemId] = useState(null);
-    const [deleteApi, setDeleteApi] = useState(null);
-
-    const toggle3 = () => {
-      setMostrarBoton(!mostrarBoton);
-    };
-
-    const Edit = (r) => {
-      setQuarter(r);
-      setModalQuarter(!modalQuarter);
-      setTypeQuarter(true);
-    };
-
-    const deletes = async (id) => {
-      // Configura showAlert a true para mostrar la alerta
-      setShowAlert(true);
-      setDeleteItemId(id);
-      setDeleteApi("quarter");
-    };
-
-
+  } =  useArtiffactsContext()
 
 
     return (
@@ -96,4 +75,4 @@ const Index = () => {
     );
 };
 
-export default Index;
+export {Item};

@@ -1,17 +1,14 @@
 import { useState, useEffect } from "react";
 import * as Reactstrap from "reactstrap";
+import { useArtiffactsContext} from '../../../context/artiffacts/artiffactsContext.js'
+function Card ({children}) {
 
-const Card = ({children}) => {
+    const {    
+      quarter,
+      toggle2
 
-    const [quarter, setQuarter] = useState([])
-    const [typeQuarter, setTypeQuarter] = useState(false)
-    const [modalQuarter, setModalQuarter] = useState(false)
+    } =  useArtiffactsContext()
 
-    const toggle2 = () => {
-        setModalQuarter(!modalQuarter)
-        setTypeQuarter(false)
-
-    };
     return (
       <Reactstrap.Card className="shadow">
         <Reactstrap.CardHeader className="bg-transparent">
@@ -40,4 +37,4 @@ const Card = ({children}) => {
              
 };
 
-export default Card;
+export {Card};
